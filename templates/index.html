@@ -356,42 +356,65 @@
             formData.append('historicalnav_t2', t2);
             formData.append('bloomberg', bb);
 
+            // Render cold start: service may be spinning up
+            loading.textContent = 'Waking up service...';
+
+            // Poll /health until app responds with JSON
+            const maxHealthChecks = 30;
+            let healthReady = false;
+            for (let i = 0; i < maxHealthChecks; i++) {
+                try {
+                    const healthResp = await fetch('/health');
+                    const ct = healthResp.headers.get('content-type') || '';
+                    if (ct.includes('application/json')) {
+                        healthReady = true;
+                        break;
+                    }
+                } catch (_) {
+                    // ignore, retry
+                }
+                loading.textContent = 'Waking up service... (attempt ' + (i + 1) + '/30)';
+                await new Promise(r => setTimeout(r, 3000));
+            }
+
+            if (!healthReady) {
+                loading.classList.remove('active');
+                loading.textContent = 'Processing...';
+                status.classList.add('active', 'error');
+                statusTitle.textContent = 'Service not ready';
+                statusBody.textContent = 'The app failed to start. Try again in a minute.';
+                processBtn.disabled = false;
+                processBtn.textContent = 'Process Files';
+                return;
+            }
+
+            loading.textContent = 'Processing files... (this may take 5–15 seconds)';
+
             try {
                 const response = await fetch('/process', {
                     method: 'POST',
                     body: formData,
                 });
 
-                const data = await response.json();
-
-                loading.classList.remove('active');
-                status.classList.add('active');
-
-                if (data.status === 'ok') {
-                    status.classList.add('success');
-                    statusTitle.textContent = 'Success!';
-                    statusBody.innerHTML = `
-                        <a href="${data.download_url}" class="download-btn">
-                            <span class="material-icons">download</span>
-                            Download Output
-                        </a>
-                        <details>
-                            <summary>Processing Log</summary>
-                            <div class="log-content">${escapeHtml(data.logs.join('\n'))}</div>
-                        </details>
-                    `;
-                } else {
-                    status.classList.add('error');
-                    statusTitle.textContent = 'Error: ' + escapeHtml(data.message);
-                    statusBody.innerHTML = `
-                        <details>
-                            <summary>Full Log</summary>
-                            <div class="log-content">${escapeHtml(data.logs.join('\n'))}</div>
-                        </details>
-                    `;
+                const ct = response.headers.get('content-type') || '';
+                if (!ct.includes('application/json')) {
+                    // Still got HTML — one more retry
+                    await new Promise(r => setTimeout(r, 5000));
+                    const retryResp = await fetch('/process', { method: 'POST', body: formData });
+                    const retryCt = retryResp.headers.get('content-type') || '';
+                    if (!retryCt.includes('application/json')) {
+                        throw new Error('Service returned non-JSON response after retry');
+                    }
+                    const retryData = await retryResp.json();
+                    handleResponse(retryData);
+                    return;
                 }
+
+                const data = await response.json();
+                handleResponse(data);
             } catch (err) {
                 loading.classList.remove('active');
+                loading.textContent = 'Processing...';
                 status.classList.add('active', 'error');
                 statusTitle.textContent = 'Network error';
                 statusBody.textContent = err.message;
@@ -400,6 +423,39 @@
             processBtn.disabled = false;
             processBtn.textContent = 'Process Files';
         });
+
+        function handleResponse(data) {
+            loading.classList.remove('active');
+            loading.textContent = 'Processing files... (this may take 5–15 seconds)';
+            status.classList.add('active');
+
+            processBtn.disabled = false;
+            processBtn.textContent = 'Process Files';
+
+            if (data.status === 'ok') {
+                status.classList.add('success');
+                statusTitle.textContent = 'Success!';
+                statusBody.innerHTML = `
+                    <a href="${data.download_url}" class="download-btn">
+                        <span class="material-icons">download</span>
+                        Download Output
+                    </a>
+                    <details>
+                        <summary>Processing Log</summary>
+                        <div class="log-content">${escapeHtml(data.logs.join('\n'))}</div>
+                    </details>
+                `;
+            } else {
+                status.classList.add('error');
+                statusTitle.textContent = 'Error: ' + escapeHtml(data.message);
+                statusBody.innerHTML = `
+                    <details>
+                        <summary>Full Log</summary>
+                        <div class="log-content">${escapeHtml(data.logs.join('\n'))}</div>
+                    </details>
+                `;
+            }
+        }
 
         function escapeHtml(str) {
             const div = document.createElement('div');
