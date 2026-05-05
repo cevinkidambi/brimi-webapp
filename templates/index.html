@@ -359,8 +359,9 @@
             // Render cold start: service may be spinning up
             loading.textContent = 'Waking up service...';
 
-            // Poll /health until app responds with JSON
-            const maxHealthChecks = 30;
+            // Poll /health until app responds with JSON, then wait a buffer
+            // Render free tier takes ~30-60s to spin up
+            const maxHealthChecks = 40; // up to 2 min
             let healthReady = false;
             for (let i = 0; i < maxHealthChecks; i++) {
                 try {
@@ -373,7 +374,7 @@
                 } catch (_) {
                     // ignore, retry
                 }
-                loading.textContent = 'Waking up service... (attempt ' + (i + 1) + '/30)';
+                loading.textContent = 'Waking up service... (' + (i + 1) + '/' + maxHealthChecks + ')';
                 await new Promise(r => setTimeout(r, 3000));
             }
 
@@ -382,11 +383,15 @@
                 loading.textContent = 'Processing...';
                 status.classList.add('active', 'error');
                 statusTitle.textContent = 'Service not ready';
-                statusBody.textContent = 'The app failed to start. Try again in a minute.';
+                statusBody.textContent = 'The app failed to start after ~2 min. Try again in a minute.';
                 processBtn.disabled = false;
                 processBtn.textContent = 'Process Files';
                 return;
             }
+
+            // Service is up — wait 5s for it to fully initialize
+            loading.textContent = 'Service ready, preparing upload...';
+            await new Promise(r => setTimeout(r, 5000));
 
             loading.textContent = 'Processing files... (this may take 5–15 seconds)';
 
@@ -395,20 +400,6 @@
                     method: 'POST',
                     body: formData,
                 });
-
-                const ct = response.headers.get('content-type') || '';
-                if (!ct.includes('application/json')) {
-                    // Still got HTML — one more retry
-                    await new Promise(r => setTimeout(r, 5000));
-                    const retryResp = await fetch('/process', { method: 'POST', body: formData });
-                    const retryCt = retryResp.headers.get('content-type') || '';
-                    if (!retryCt.includes('application/json')) {
-                        throw new Error('Service returned non-JSON response after retry');
-                    }
-                    const retryData = await retryResp.json();
-                    handleResponse(retryData);
-                    return;
-                }
 
                 const data = await response.json();
                 handleResponse(data);
