@@ -62,6 +62,9 @@ def get_token():
     """Get a valid access token (refresh if expired)."""
     env = load_env()
 
+    # Ensure token dir exists (may be missing on Render due to .gitignore)
+    os.makedirs(os.path.dirname(TOKEN_FILE), exist_ok=True)
+
     # Try existing token first
     if os.path.exists(TOKEN_FILE):
         with open(TOKEN_FILE) as f:
