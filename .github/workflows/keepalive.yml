@@ -1,0 +1,10 @@
+name: Render Keepalive
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -sf https://brimi-webapp.onrender.com/health
