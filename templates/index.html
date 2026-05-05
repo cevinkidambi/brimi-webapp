@@ -351,65 +351,52 @@
             processBtn.disabled = true;
             processBtn.textContent = 'Processing...';
 
-            const formData = new FormData();
-            formData.append('historicalnav_t1', t1);
-            formData.append('historicalnav_t2', t2);
-            formData.append('bloomberg', bb);
-
-            // Render cold start: service may be spinning up
+            // Render cold start: service may be sleeping, returns HTML placeholder
+            // POST /process directly; if HTML response, wait and retry
             loading.textContent = 'Waking up service...';
 
-            // Poll /health until app responds with JSON, then wait a buffer
-            // Render free tier takes ~30-60s to spin up
-            const maxHealthChecks = 40; // up to 2 min
-            let healthReady = false;
-            for (let i = 0; i < maxHealthChecks; i++) {
+            const maxRetries = 20; // up to ~3 min total
+            for (let attempt = 0; attempt < maxRetries; attempt++) {
+                // Rebuild FormData (stream consumed on each POST)
+                const retryFormData = new FormData();
+                retryFormData.append('historicalnav_t1', t1);
+                retryFormData.append('historicalnav_t2', t2);
+                retryFormData.append('bloomberg', bb);
+
                 try {
-                    const healthResp = await fetch('/health');
-                    const ct = healthResp.headers.get('content-type') || '';
+                    const response = await fetch('/process', {
+                        method: 'POST',
+                        body: retryFormData,
+                    });
+
+                    const ct = response.headers.get('content-type') || '';
                     if (ct.includes('application/json')) {
-                        healthReady = true;
-                        break;
+                        const data = await response.json();
+                        handleResponse(data);
+                        return;
                     }
-                } catch (_) {
-                    // ignore, retry
+
+                    // Got HTML — Render cold start page, wait and retry
+                    if (attempt < maxRetries - 1) {
+                        await new Promise(r => setTimeout(r, 3000));
+                        loading.textContent = 'Waking up service... (attempt ' + (attempt + 1) + '/' + maxRetries + ')';
+                    }
+                } catch (err) {
+                    if (attempt < maxRetries - 1) {
+                        await new Promise(r => setTimeout(r, 3000));
+                        loading.textContent = 'Waking up service... (attempt ' + (attempt + 1) + '/' + maxRetries + ')';
+                    } else {
+                        throw err;
+                    }
                 }
-                loading.textContent = 'Waking up service... (' + (i + 1) + '/' + maxHealthChecks + ')';
-                await new Promise(r => setTimeout(r, 3000));
             }
 
-            if (!healthReady) {
-                loading.classList.remove('active');
-                loading.textContent = 'Processing...';
-                status.classList.add('active', 'error');
-                statusTitle.textContent = 'Service not ready';
-                statusBody.textContent = 'The app failed to start after ~2 min. Try again in a minute.';
-                processBtn.disabled = false;
-                processBtn.textContent = 'Process Files';
-                return;
-            }
-
-            // Service is up — wait 5s for it to fully initialize
-            loading.textContent = 'Service ready, preparing upload...';
-            await new Promise(r => setTimeout(r, 5000));
-
-            loading.textContent = 'Processing files... (this may take 5–15 seconds)';
-
-            try {
-                const response = await fetch('/process', {
-                    method: 'POST',
-                    body: formData,
-                });
-
-                const data = await response.json();
-                handleResponse(data);
-            } catch (err) {
-                loading.classList.remove('active');
-                loading.textContent = 'Processing...';
-                status.classList.add('active', 'error');
-                statusTitle.textContent = 'Network error';
-                statusBody.textContent = err.message;
-            }
+            // Exhausted retries
+            loading.classList.remove('active');
+            loading.textContent = 'Processing...';
+            status.classList.add('active', 'error');
+            statusTitle.textContent = 'Service not ready';
+            statusBody.textContent = 'Could not reach the service after multiple attempts. Try again later.';
 
             processBtn.disabled = false;
             processBtn.textContent = 'Process Files';
