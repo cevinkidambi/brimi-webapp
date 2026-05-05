@@ -94,16 +94,17 @@ BLOOMBERG_NAMES = {"MSCI World Islamic Index", "MSCI Indonesia ESG Screened",
 QUARTILE_LABELS = {1: "Q1", 2: "Q2", 3: "Q3", 4: "Q4"}
 QUARTILE_COLORS = {"Q1": "70AD47", "Q2": "FFC000", "Q3": "ED7D31", "Q4": "FF0000"}
 
-# Scoring API rank-to-score mapping
-SCORING_SCORE = {
-    1: "0", 2: "1-", 3: "1", 4: "1+",
-    5: "2-", 6: "2", 7: "2+",
-    8: "3-", 9: "3", 10: "3+",
-    11: "4-", 12: "4", 13: "4+",
-    14: "5-", 15: "5",
-}
-
 FUND_MAP: dict = {}
+
+# Scoring API score string → star text format
+SCORE_STARS = {
+    "0": "No Score", "1-": "* -", "1": "*", "1+": "* +",
+    "2-": "* * -", "2": "* *", "2+": "* * +",
+    "3-": "* * * -", "3": "* * *", "3+": "* * * +",
+    "4-": "* * * * -", "4": "* * * *", "4+": "* * * * +",
+    "5-": "* * * * * -", "5": "* * * * *", "5+": "* * * * * +",
+    "notapplied": "No Score",
+}
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -400,13 +401,18 @@ def _uniq(*args) -> list:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def rank_quartile(values: list) -> list[tuple]:
-    n      = len(values)
-    valid  = [(i, float(v)) for i, v in enumerate(values)
-               if v is not None and not (isinstance(v, float) and math.isnan(v))]
+    """Rank values descending, assign quartile using Excel-style thresholds.
+
+    T_q = q * (n-1) / 4 + 1 for q in {1,2,3}
+    Q = smallest q where rank < T_q, default 4
+    """
+    n = len(values)
+    valid = [(i, float(v)) for i, v in enumerate(values)
+             if v is not None and not (isinstance(v, float) and math.isnan(v))]
     result = [(None, None)] * n
     if not valid:
         return result
-    total  = len(valid)
+    total = len(valid)
     sorted_valid = sorted(valid, key=lambda x: x[1], reverse=True)
     # Excel-style RANK: tied values get the same rank (highest position)
     rank = 1
@@ -415,8 +421,52 @@ def rank_quartile(values: list) -> list[tuple]:
             pass  # same rank as previous (tie)
         else:
             rank = pos + 1
-        q = min(max(math.ceil(rank / (total / 4)) if total >= 4 else (1 if rank <= total // 2 else 2), 1), 4)
+        # Quartile thresholds: T_q = q*(n-1)/4 + 1
+        q = 4
+        for candidate in (1, 2, 3):
+            if rank < candidate * (total - 1) / 4 + 1:
+                q = candidate
+                break
         result[idx] = (rank, q)
+    return result
+
+
+def _fetch_scoring_by_name():
+    """Fetch scoring + daily NAV API, return {norm(name): scoring_record}."""
+    from fetch_investdata import get_token
+    import requests
+
+    token = get_token()
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # Fetch scoring data
+    r = requests.get("https://api.infovesta.com/api/mutualfund/data/scoring", headers=headers)
+    r.raise_for_status()
+    scoring_data = r.json()
+
+    # Fetch daily NAV for name → productId mapping
+    r = requests.get("https://api.infovesta.com/api/mutualfund/data/dailynavlatesttwodates", headers=headers)
+    r.raise_for_status()
+    nav_data = r.json()
+
+    # Build productId → name mapping
+    name_by_pid = {}
+    for item in nav_data:
+        name_by_pid[item["productId"]] = item["name"]
+
+    # Build normalized name → scoring record
+    result = {}
+    for s in scoring_data:
+        pid = s["productId"]
+        display_name = name_by_pid.get(pid)
+        if not display_name:
+            continue
+        result[norm(display_name)] = s
+        # Also index by stripped TR name
+        tr_stripped = strip_tr(display_name)
+        if tr_stripped != display_name:
+            result[norm(tr_stripped)] = s
+
     return result
 
 
@@ -537,7 +587,7 @@ def process(input_path: str, output_path: str,
         ppt_df["is_benchmark"] = False
     ppt_df["is_benchmark"] = ppt_df["is_benchmark"].fillna(False).astype(bool)
 
-    # Rank by quartile periods within each group
+    # Rank by quartile periods within each group (local ranking)
     for group, grp in ppt_df[~ppt_df["is_benchmark"]].groupby("group", sort=False):
         for period_col, q_col in [
             ("3 Bln(%)", "Quartile_3Bln"),
@@ -546,17 +596,36 @@ def process(input_path: str, output_path: str,
             ("YTD(%)", "Quartile_YTD"),
         ]:
             rq = rank_quartile(grp[period_col].tolist())
-            ppt_df.loc[grp.index, "Score 1Y" if q_col == "Quartile" else q_col] = [r for r, _ in rq]
-            if q_col == "Quartile":
-                ppt_df.loc[grp.index, "Quartile"] = [q for _, q in rq]
+            ppt_df.loc[grp.index, q_col] = [q for _, q in rq]
 
-    # Compute since_inception: (NAV / 100 - 1) * 100
+    # Scoring API: Score 1Y from rankoneyearUrl
+    scoring_lookup = _fetch_scoring_by_name()
+    for idx, f in ppt_df.iterrows():
+        if f.get("is_benchmark"):
+            continue
+        display = f["display_name"]
+        scoring = scoring_lookup.get(norm(display))
+        if scoring is None:
+            scoring = scoring_lookup.get(norm(strip_tr(display)))
+
+        if scoring:
+            url = scoring.get("rankoneyearUrl", "")
+            m = re.search(r"images/(.+)\.png$", url)
+            if m:
+                raw = m.group(1)
+                ppt_df.loc[idx, "Score 1Y"] = SCORE_STARS.get(raw, raw)
+            else:
+                ppt_df.loc[idx, "Score 1Y"] = "No Score"
+        else:
+            ppt_df.loc[idx, "Score 1Y"] = "No Score"
+
+    # Compute since_inception: (NAV / 1000 - 1) * 100
     ppt_df["since_inception"] = None
     for idx, f in ppt_df.iterrows():
         nav = f.get("NAB/UP")
         if nav is not None and not (isinstance(nav, float) and math.isnan(nav)):
             try:
-                ppt_df.loc[idx, "since_inception"] = (float(nav) / 100 - 1) * 100
+                ppt_df.loc[idx, "since_inception"] = (float(nav) / 1000 - 1) * 100
             except (TypeError, ValueError):
                 pass
 
@@ -811,14 +880,8 @@ def write_perf_table(wb, df, nav_date_str=None):
         q_ytd   = f.get("Quartile_YTD")
         q_lbl = lambda v: QUARTILE_LABELS.get(int(v)) if v is not None and not (isinstance(v, float) and math.isnan(v)) else None
 
-        # Score 1Y: convert rank to API score string
-        score_rank = f.get("Score 1Y")
-        if score_rank is not None and not (isinstance(score_rank, float) and math.isnan(score_rank)):
-            score_str = SCORING_SCORE.get(int(score_rank), str(int(score_rank)))
-        elif f.get("is_benchmark"):
-            score_str = None
-        else:
-            score_str = "No Score"
+        # Score 1Y: star text format from scoring API (e.g. "* * * -", "* +", "No Score")
+        score_str = f.get("Score 1Y")
 
         # SI Date
         si_date = f.get("si_date", "")
