@@ -63,12 +63,14 @@ def get_token():
     """Get a valid access token (refresh if expired)."""
     env = load_env()
 
-    # Ensure token dir exists
-    os.makedirs(os.path.dirname(TOKEN_FILE), exist_ok=True)
+    # Use /tmp for token on Vercel (read-only filesystem at /var/task)
+    token_file = TOKEN_FILE
+    if os.environ.get("VERCEL"):
+        token_file = "/tmp/investdata_token.json"
 
     # Try existing token first
-    if os.path.exists(TOKEN_FILE):
-        with open(TOKEN_FILE) as f:
+    if os.path.exists(token_file):
+        with open(token_file) as f:
             tok = json.load(f)
         # expires_in is a static number — check actual age using obtained_at
         obtained_at = tok.get("obtained_at", 0)
@@ -90,9 +92,10 @@ def get_token():
     resp.raise_for_status()
     tok = resp.json()
     tok["obtained_at"] = time.time()
-    # Persist token locally if filesystem is writable (skip on Vercel)
+    # Persist token (skip on Vercel if /tmp not writable)
     try:
-        with open(TOKEN_FILE, "w") as f:
+        os.makedirs(os.path.dirname(token_file), exist_ok=True)
+        with open(token_file, "w") as f:
             json.dump(tok, f, indent=2)
     except OSError:
         pass
