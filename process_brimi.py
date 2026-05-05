@@ -639,14 +639,31 @@ def process(input_path: str, output_path: str,
                 "YTD(%)": r.get("YTD(%)"),
             }
 
+        # Build D-2 lookup as fallback for funds missing from D-1
+        # (e.g. Global/USD funds reported on previous day)
+        _d2_by_name = {}
+        for _, r in d2.iterrows():
+            _d2_by_name[norm(str(r.iloc[0]))] = {
+                "3 Bln(%)": r.get("3 Bln(%)"),
+                "6 Bln(%)": r.get("6 Bln(%)"),
+                "1 Thn(%)": r.get("1 Thn(%)"),
+                "YTD(%)": r.get("YTD(%)"),
+            }
+
+        def _get_perf(name: str, col: str):
+            """Get performance value from D-1, falling back to D-2."""
+            val = _d1_by_name.get(name, {}).get(col)
+            if val is not None and not (isinstance(val, float) and math.isnan(val)):
+                return val
+            val = _d2_by_name.get(name, {}).get(col)
+            if val is not None and not (isinstance(val, float) and math.isnan(val)):
+                return val
+            return None
+
         _quartile_lookup = {}
         for gi, g_norm_names in _group_funds.items():
             for period_col in ["3 Bln(%)", "6 Bln(%)", "1 Thn(%)", "YTD(%)"]:
-                # Get values for all funds in this group
-                items = []
-                for n in g_norm_names:
-                    val = _d1_by_name.get(n, {}).get(period_col)
-                    items.append(val)
+                items = [_get_perf(n, period_col) for n in g_norm_names]
                 rq = rank_quartile(items)
                 for n, (rank, q) in zip(g_norm_names, rq):
                     if rank is not None:
@@ -657,7 +674,7 @@ def process(input_path: str, output_path: str,
         # already have its own entry (both may be in the same group).
         for tr_name, entry in list(_quartile_lookup.items()):
             non_tr = tr_name.replace(" - total return*", "").strip()
-            if non_tr and non_tr != tr_name and non_tr in _d1_by_name and non_tr not in _quartile_lookup:
+            if non_tr and non_tr != tr_name and (non_tr in _d1_by_name or non_tr in _d2_by_name) and non_tr not in _quartile_lookup:
                 _quartile_lookup[non_tr] = entry
     else:
         _quartile_lookup = {}
