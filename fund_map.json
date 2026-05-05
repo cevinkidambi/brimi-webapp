@@ -1,0 +1,46 @@
+{
+  "_comment": "Universal fund name map. Keys = display names or aliases used in the template (NEW PAGE TABLE col A or col N). Values = canonical lookup keys.\n\nPurpose:\n- Maps fund names that differ between BRI data (BRIMI D-1/D-2) and our data (D-1/D-2).\n- The script uses these mappings BEFORE the built-in alias (col N) and strip-Total-Return logic.\n- Add entries here whenever a fund name mismatch is discovered between the two AUM sources.\n\nAUM Priority:\n  1. BRIMI D-1 (IDR) or BRIMI D-2 (USD) — BRI's own data.\n  2. Fallback: D-1 / D-2 AUM (31-Mar-2026) column — our data.\n\n'brimi_name' overrides what the script looks up in BRIMI D-1/D-2.\n'd1_name'    overrides what the script looks up in D-1/D-2 for AUM fallback.\nLeave null to use the default (display_name or alias from template).",
+
+  "mappings": [
+    {
+      "display_name": "BRI Balanced Regular Income Fund Kelas A",
+      "brimi_name": "BRI Balanced Regular Income Fund Kelas A",
+      "d1_name": null,
+      "nav_name": null,
+      "note": "No alias needed; name is identical in both sources."
+    },
+    {
+      "display_name": "BRI Gamasteps Pasar Uang",
+      "brimi_name": "BRI Gamasteps Pasar Uang",
+      "d1_name": "BRI GamaSteps Pasar Uang",
+      "nav_name": null,
+      "note": "Capitalisation difference: 'Gamasteps' (BRIMI) vs 'GamaSteps' (D-1). The script's case-insensitive lookup handles this automatically, but listed here for documentation."
+    },
+    {
+      "display_name": "Danareksa Mawar Ekuitas Utama",
+      "brimi_name": null,
+      "d1_name": "BRI Mawar Ekuitas Utama",
+      "nav_name": null,
+      "note": "Old Danareksa brand name used in BRIMI D-2; maps to the BRI-branded fund in D-1."
+    },
+    {
+      "display_name": "BRI ETF Indonesia Top 40",
+      "brimi_name": "BRI ETF Indonesia Top 40",
+      "d1_name": null,
+      "nav_name": null,
+      "note": "Found in BRIMI D-2 (not D-1) even though it is an IDR fund; the script tries both BRIMI tables."
+    },
+    {
+      "display_name": "BRI Pendapatan Prima Plus - Total Return*",
+      "brimi_name": null,
+      "d1_name": null,
+      "nav_name": "BRI Pendapatan Prima Plus",
+      "note": "Exception: NAV formula uses VLOOKUP($N341, D-1) = alias 'BRI Pendapatan Prima Plus', not display_name. nav_name overrides the NAV lookup."
+    }
+  ],
+
+  "total_return_preference": {
+    "_comment": "When both a regular and a 'Total Return*' version of the same fund exist in D-1/D-2, use the Total Return version for performance lookup. The script automatically prefers Total Return. List exceptions here.",
+    "exceptions": []
+  }
+}

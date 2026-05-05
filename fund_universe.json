@@ -1,0 +1,1847 @@
+{
+  "_comment": "Fund universe config. Edit this file to add/remove/deactivate funds. Set active=false to temporarily exclude a fund without deleting it. Run process_brimi.py normally — it reads this file instead of the Excel template. Use manage_funds.py to add/remove funds from the CLI.",
+  "page_table": {
+    "_comment": "Sections and funds shown in NEW PAGE TABLE output.",
+    "sections": [
+      {
+        "section": "Equity Fund (Big Cap)",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "Bahana Primavera Plus",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder Dana Prestasi Plus",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BRI Mawar",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Ashmore Dana Ekuitas Nusantara - Total Return*",
+            "alias": "Ashmore Dana Ekuitas Nusantara - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Investa Atraktif Kelas B",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Manulife Dana Saham Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNP Paribas Pesona",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Batavia Dana Saham",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "LQ45",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Equity Fund (Med/Small Cap)",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "BRI Mawar Fokus 10",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder Dana Istimewa",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Investa Ekuitas Dinamis",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNP Paribas Solaris",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Manulife Saham SMC Plus",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "IDX Small-Mid Cap Liquid",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Equity Fund (ALL Cap)",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "Tram Consumption Plus Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Manulife Saham Andalan",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder Dana Prestasi",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BRI Mawar Konsumer 10 Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder 90 Plus Equity Fund",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Allianz Alpha Sector Rotation Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNP Paribas Ekuitas",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Eastspring Investments Alpha Navigator Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Indeks Harga Saham Gabungan",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Equity Fund (ALL Cap)",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "Tram Consumption Plus Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Manulife Saham Andalan",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder Dana Prestasi",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BRI Mawar Komoditas 10",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder 90 Plus Equity Fund",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Allianz Alpha Sector Rotation Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNP Paribas Ekuitas",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Eastspring Investments Alpha Navigator Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Indeks Harga Saham Gabungan",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Equity Fund & Index Fund (Sharia)",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "Trim Syariah Saham",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BRI Syariah Saham",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Investa Ekuitas Syariah",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Manulife Syariah Sektoral Amanah kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNP Paribas Pesona Syariah",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Panin Dana Syariah Saham",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Batavia Dana Saham Syariah",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BRI Indeks Syariah",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          },
+          {
+            "display_name": "Indeks Saham Syariah Indonesia",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          },
+          {
+            "display_name": "Infovesta sharia Equity fund Index",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          },
+          {
+            "display_name": "Jakarta Islamic Index",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Global Sharia Equity Fund*",
+        "is_usd": true,
+        "aum_unit": "Juta USD",
+        "funds": [
+          {
+            "display_name": "Mandiri Global Sharia Equity Dollar Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Allianz High Dividend Global Sharia Equity Dollar Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder Global Syariah Equity Fund",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Batavia Global ESG Sharia Equity USD",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNP Paribas Cakra Syariah USD kelas RK1",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BRI G20 Sharia Equity Fund Dollar",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "SAM Global Sharia ESG Equity Dollar",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Ashmore Dana USD Equity Nusantara",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Bahana US Opportunity Sharia Equity USD",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "MSCI World Islamic Index",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Equity Fund (BPJS)",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "Trimegah Bhakti Bangsa - Total Return*",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Manulife Dana Saham Utama Kelas I",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Bahana Stellar Equity Fund Kelas I - Total Return*",
+            "alias": "Bahana Stellar Equity Fund Kelas I - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Ashmore Saham Sejahtera Nusantara - Total Return*",
+            "alias": "Ashmore Saham Sejahtera Nusantara - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNI-AM Dana Saham Bandagara",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Syailendra Equity Garuda Fund - Total Return*",
+            "alias": "Syailendra Equity Garuda Fund - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNI - AM Dana Saham Inspiring Equity Fund",
+            "alias": "BNI - AM Dana Saham Inspiring Equity Fund - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Bahana Primavera 99 Kelas S",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BRI Mawar Ekuitas Plus - Total Return*",
+            "alias": "BRI Mawar Ekuitas Plus",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Investa Atraktif Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Investa Equity Movement",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Panin Dana Berdedikasi - Total Return*",
+            "alias": "Panin Dana Berdedikasi - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNP Paribas Maxi Saham",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Syailendra Dana Ekuitas Sejahtera - Total Return*",
+            "alias": "Syailendra Dana Ekuitas Sejahtera - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Ashmore Saham Sejahtera Nusantara II - Total Return*",
+            "alias": "Ashmore Saham Sejahtera Nusantara II - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Investa Cerdas Bangsa Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "SAM Dana Cerdas - Total Return*",
+            "alias": "SAM Dana Cerdas - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Batavia Saham Sejahtera - Total Return*",
+            "alias": "Batavia Saham Sejahtera - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Batavia Saham Cemerlang - Total Return*",
+            "alias": "Batavia Saham Cemerlang - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Indeks Harga Saham Gabungan",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          },
+          {
+            "display_name": "LQ45",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Equity Fund (BPJS)",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "Trimegah Bhakti Bangsa - Total Return*",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Manulife Dana Saham Utama Kelas I",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Bahana Stellar Equity Fund Kelas I - Total Return*",
+            "alias": "Bahana Stellar Equity Fund Kelas I - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Ashmore Saham Sejahtera Nusantara - Total Return*",
+            "alias": "Ashmore Saham Sejahtera Nusantara - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNI-AM Dana Saham Bandagara",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Syailendra Equity Garuda Fund - Total Return*",
+            "alias": "Syailendra Equity Garuda Fund - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNI - AM Dana Saham Inspiring Equity Fund",
+            "alias": "BNI - AM Dana Saham Inspiring Equity Fund - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BRI Mawar Ekuitas Utama - Total Return*",
+            "alias": "BRI Mawar Ekuitas Utama",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Investa Atraktif Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Investa Equity Movement",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Panin Dana Berdedikasi - Total Return*",
+            "alias": "Panin Dana Berdedikasi - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNP Paribas Maxi Saham",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Syailendra Dana Ekuitas Sejahtera - Total Return*",
+            "alias": "Syailendra Dana Ekuitas Sejahtera - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Ashmore Saham Sejahtera Nusantara II - Total Return*",
+            "alias": "Ashmore Saham Sejahtera Nusantara II - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Bahana Primavera 99 Kelas S",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Investa Cerdas Bangsa Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "SAM Dana Cerdas - Total Return*",
+            "alias": "SAM Dana Cerdas - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Batavia Saham Sejahtera - Total Return*",
+            "alias": "Batavia Saham Sejahtera - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Batavia Saham Cemerlang - Total Return*",
+            "alias": "Batavia Saham Cemerlang - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Indeks Harga Saham Gabungan",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          },
+          {
+            "display_name": "LQ45",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Index & ETF Fund",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "BRI MSCI Indonesia ESG Screened Kelas B - Total Return*",
+            "alias": "BRI MSCI Indonesia ESG Screened Kelas B",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BRI MSCI Indonesia ESG Screened Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "MSCI Indonesia ESG Screened",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "ETF FUND (Active)",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "Pinnacle Enhanced Liquid ETF",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BRI ETF Indonesia Top 40",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Batavia Smart Liquid ETF",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri ETF LQ45",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Money Market",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "Sucorinvest Money Market Fund",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Syailendra Dana Kas",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Manulife Indonesia Money Market Fund Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Trim Kas 2 Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BRI Gamasteps Pasar Uang",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Maybank Dana Pasar Uang",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Bahana Dana Likuid Kelas G",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Batavia Dana Kas Maxima",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Investa Pasar Uang Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder Dana Likuid",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Eastspring Investments Cash Reserve Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNP Paribas Rupiah Plus",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Infovesta Money Market Fund Index",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Money Market",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "Sucorinvest Money Market Fund",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Syailendra Dana Kas",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Manulife Indonesia Money Market Fund Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BRI Seruni Pasar Uang III",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Trim Kas 2 Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Maybank Dana Pasar Uang",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Bahana Dana Likuid Kelas G",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Batavia Dana Kas Maxima",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Investa Pasar Uang Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder Dana Likuid",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Eastspring Investments Cash Reserve Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNP Paribas Rupiah Plus",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Infovesta Money Market Fund Index",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Money Market",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "Sucorinvest Money Market Fund",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Syailendra Dana Kas",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Manulife Indonesia Money Market Fund Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Trim Kas 2 Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Maybank Dana Pasar Uang",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BRI Seruni Pasar Uang II Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Bahana Dana Likuid Kelas G",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Batavia Dana Kas Maxima",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Investa Pasar Uang Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder Dana Likuid",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Eastspring Investments Cash Reserve Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNP Paribas Rupiah Plus",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Infovesta Money Market Fund Index",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Money Market",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "Sucorinvest Money Market Fund",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Maybank Dana Pasar Uang",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Bahana Dana Likuid Kelas G",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Batavia Dana Kas Maxima",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BRI Gebyar Dana Likuid",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Investa Pasar Uang Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder Dana Likuid",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Eastspring Investments Cash Reserve Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Infovesta Money Market Fund Index",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Money Market USD",
+        "is_usd": true,
+        "aum_unit": "Juta USD",
+        "funds": [
+          {
+            "display_name": "Manulife Liquid Fund USD Kelas I",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Bahana Liquid USD",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Money Market USD",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BRI Seruni Likuid Dolar",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Sharia Money Market Fund",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "BRI Seruni Pasar Uang Syariah",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Bahana Likuid Syariah Kelas S",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Sucorinvest Sharia Money Market Fund",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNIAM Dana Lancar Syariah",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Principal Cash Fund Syariah 2",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Maybank Syariah Money Market Fund 2",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Pasar Uang Syariah Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Batavia Dana Kas Syariah Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder Dana Likuid Syariah",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Cipta Dana Kas Syariah",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Infovesta Sharia Money Market Fund",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Balanced Fund (Short Duration Dividend)",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "BRI Balanced Regular Income Fund Kelas A",
+            "alias": "BRI Balanced Regular Income Fund kelas A - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BRI Balanced Regular Income Fund Kelas A - Total Return*",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNP Paribas Equitra Campuran Harmoni",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder Dana Andalan II",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Infovesta Government Bond Index Short",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "BALANCED FUND (Periodic Dividend)",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "BRI Balanced Regular Income Fund Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Manulife Pendapatan Bulanan II",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Balanced Fund",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "Panin Dana Unggulan",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BRI Anggrek Fleksibel",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Manulife Dana Tumbuh Berimbang",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Investa Aktif Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder Dynamic Balanced Fund",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder Dana Terpadu II",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Ashmore Dana Balanced Nusantara - Total Return*",
+            "alias": "Ashmore Dana Balanced Nusantara - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Manulife Dana Campuran II",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Batavia Dana Dinamis",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Infovesta Balanced Fund Index",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Balanced Syariah",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "Trim Syariah Berimbang",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Investa Syariah Berimbang Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder Syariah Balanced Fund",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BRI Syariah Berimbang",
+            "alias": "BRI Syariah Berimbang - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Infovesta Sharia Balanced Fund Index",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Fixed Income Fund",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "BRI Melati Pendapatan Utama",
+            "alias": "BRI Melati Pendapatan Utama - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Ashmore Dana Obligasi Nusantara Kelas A - Total Return*",
+            "alias": "Ashmore Dana Obligasi Nusantara Kelas A - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNP Paribas Prima II Kelas RK1",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Bahana Pendapatan Tetap Makara Prima Kelas G",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Trimegah Fixed Income Plan - Total Return*",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Investa Dana Obligasi Seri II Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Bahana Obligasi Ganesha Kelas D - Total Return*",
+            "alias": "Bahana Obligasi Ganesha Kelas D - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder Dana Mantap Plus II",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Infovesta Government Bond Index",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Fixed Income Fund",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "BRI Pendapatan Tetap Indonesia Sehat",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Ashmore Dana Obligasi Nusantara Kelas A - Total Return*",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNP Paribas Prima II Kelas RK1",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Bahana Pendapatan Tetap Makara Prima Kelas G",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Trimegah Fixed Income Plan - Total Return*",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Investa Dana Obligasi Seri II Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Bahana Obligasi Ganesha Kelas D - Total Return*",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder Dana Mantap Plus II",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Infovesta Government Bond Index",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Fixed Income Fund (SUN ONLY)",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "BRI Brawijaya Abadi Pendapatan Tetap",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNP Paribas Prima II Kelas RK1",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Ashmore Dana Obligasi Nusantara Kelas A - Total Return*",
+            "alias": "Ashmore Dana Obligasi Nusantara Kelas A - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder Prestasi Gebyar Indonesia II",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Investa Dana Obligasi Seri II Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Panin Gebyar Indonesia II",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Eastspring Investments IDR High Grade Kelas A - Total Return*",
+            "alias": "Eastspring Investments IDR High Grade Kelas A - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Bahana Obligasi Kehati Lestari Kelas G",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder Dana Mantap Plus II",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Manulife Obligasi Negara Indonesia II Kelas Income 1",
+            "alias": "Manulife Obligasi Negara Indonesia II Kelas Income 1 - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Infovesta Government Bond Index",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Fixed Income Fund (SUN ONLY)",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "BRI Gebyar Indonesia II",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Ashmore Dana Obligasi Nusantara Kelas A - Total Return*",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNP Paribas Prima II Kelas RK1",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Bahana Pendapatan Tetap Makara Prima Kelas G",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Trimegah Fixed Income Plan - Total Return*",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Investa Dana Obligasi Seri II Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Bahana Obligasi Ganesha Kelas D - Total Return*",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder Dana Mantap Plus II",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Infovesta Government Bond Index",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Fixed Income USD",
+        "is_usd": true,
+        "aum_unit": "Juta USD",
+        "funds": [
+          {
+            "display_name": "Ashmore Dana USD Nusantara Kelas A - Total Return*",
+            "alias": "Ashmore Dana USD Nusantara Kelas A - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNP Paribas Prima USD Kelas RK1",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BRI Melati Premium Dollar",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder USD Bond Fund Class A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Investa Dana Dollar Mandiri Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Manulife USD Fixed Income Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Infovesta Government Bond Index",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "FIXED INCOME (Institution)",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "funds": [
+          {
+            "display_name": "BRI Pendapatan Prima Plus - Total Return*",
+            "alias": "BRI Pendapatan Prima Plus",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Obligasi Utama Sejahtera",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "PNM SBN 90 - Total Return*",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Bahana Pendapatan Tetap Utama",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Infovesta Fixed Income Fund Index",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          }
+        ]
+      }
+    ]
+  },
+  "performance_table": {
+    "_comment": "Funds shown in NEW PERFORMANCE TABLE output. brimi_alias: name used to look up AUM in BRIMI D-1/D-2 (null = use display_name). group: Equity | Balanced | Fixed Income | Money Market (used for ranking). is_price_return: true = look up base NAV, not Total Return version.",
+    "funds": [
+      {
+        "display_name": "BRI Mawar",
+        "brimi_alias": null,
+        "group": "Equity",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI Mawar Konsumer 10 Kelas A",
+        "brimi_alias": null,
+        "group": "Equity",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI Mawar Fokus 10",
+        "brimi_alias": null,
+        "group": "Equity",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI Mawar Komoditas 10",
+        "brimi_alias": null,
+        "group": "Equity",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI Mawar Ekuitas Plus",
+        "brimi_alias": null,
+        "group": "Equity",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI Mawar Ekuitas Utama",
+        "brimi_alias": "Danareksa Mawar Ekuitas Utama",
+        "group": "Equity",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI G20 Sharia Equity Fund Dollar",
+        "brimi_alias": null,
+        "group": "Equity",
+        "is_price_return": false,
+        "is_usd": true,
+        "active": true
+      },
+      {
+        "display_name": "BRI Syariah Saham",
+        "brimi_alias": null,
+        "group": "Equity",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI Indeks Syariah",
+        "brimi_alias": null,
+        "group": "Equity",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI ETF Indonesia Top 40",
+        "brimi_alias": "Danareksa ETF Indonesia Top 40",
+        "group": "Equity",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI MSCI Indonesia ESG Screened Kelas A",
+        "brimi_alias": null,
+        "group": "Equity",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI MSCI Indonesia ESG Screened Kelas B",
+        "brimi_alias": null,
+        "group": "Equity",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI Anggrek Fleksibel",
+        "brimi_alias": null,
+        "group": "Balanced",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI Balanced Regular Income Fund Kelas A",
+        "brimi_alias": "BRI Balanced Regular Income Fund Kelas A",
+        "group": "Balanced",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI Balanced Regular Income Fund Kelas A - Price Return",
+        "brimi_alias": "BRI Balanced Regular Income Fund Kelas A",
+        "group": "Balanced",
+        "is_price_return": true,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI Syariah Berimbang",
+        "brimi_alias": "BRI Syariah Berimbang - Total Return*",
+        "group": "Balanced",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI Pendapatan Tetap Indonesia Sehat",
+        "brimi_alias": null,
+        "group": "Fixed Income",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI Melati Pendapatan Utama",
+        "brimi_alias": "BRI Melati Pendapatan Utama - Total Return*",
+        "group": "Fixed Income",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI Brawijaya Abadi Pendapatan Tetap",
+        "brimi_alias": null,
+        "group": "Fixed Income",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI Gebyar Indonesia II",
+        "brimi_alias": "Danareksa Gebyar Indonesia II",
+        "group": "Fixed Income",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI Pendapatan Prima Plus",
+        "brimi_alias": null,
+        "group": "Fixed Income",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI Melati Premium Dollar",
+        "brimi_alias": null,
+        "group": "Fixed Income",
+        "is_price_return": false,
+        "is_usd": true,
+        "active": true
+      },
+      {
+        "display_name": "BRI Seruni Pasar Uang II Kelas A",
+        "brimi_alias": null,
+        "group": "Money Market",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI Seruni Pasar Uang III",
+        "brimi_alias": null,
+        "group": "Money Market",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI Gamasteps Pasar Uang",
+        "brimi_alias": null,
+        "group": "Money Market",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI Seruni Pasar Uang Syariah",
+        "brimi_alias": null,
+        "group": "Money Market",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI Gebyar Dana Likuid",
+        "brimi_alias": "Danareksa Gebyar Dana Likuid",
+        "group": "Money Market",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      },
+      {
+        "display_name": "BRI Seruni Likuid Dolar",
+        "brimi_alias": "REKSA DANA BRI SERUNI LIKUID DOLAR",
+        "group": "Money Market",
+        "is_price_return": false,
+        "is_usd": false,
+        "active": true
+      }
+    ]
+  }
+}
