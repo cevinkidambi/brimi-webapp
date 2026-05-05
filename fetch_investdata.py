@@ -37,7 +37,16 @@ OUTPUT_DIR = os.path.join(_BASE_DIR, "very_raw_data")
 
 
 def load_env():
-    """Load credentials from .env file."""
+    """Load credentials from environment variables or .env file fallback."""
+    # Prefer environment variables (Render deployment)
+    if os.environ.get("INVESTDATA_USERNAME"):
+        return {
+            "INVESTDATA_USERNAME": os.environ["INVESTDATA_USERNAME"],
+            "INVESTDATA_PASSWORD": os.environ["INVESTDATA_PASSWORD"],
+            "INVESTDATA_CLIENT_ID": os.environ.get("INVESTDATA_CLIENT_ID", "api2"),
+            "INVESTDATA_CLIENT_SECRET": os.environ.get("INVESTDATA_CLIENT_SECRET", "api2"),
+        }
+    # Fallback to .env file (local development)
     env = {}
     with open(ENV_FILE) as f:
         for line in f:
