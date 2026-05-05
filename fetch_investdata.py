@@ -22,6 +22,7 @@ Credentials from investdata_api/.env
 import os
 import sys
 import json
+import time
 import requests
 import pandas as pd
 import openpyxl
@@ -62,15 +63,17 @@ def get_token():
     """Get a valid access token (refresh if expired)."""
     env = load_env()
 
-    # Ensure token dir exists (may be missing on Render due to .gitignore)
+    # Ensure token dir exists
     os.makedirs(os.path.dirname(TOKEN_FILE), exist_ok=True)
 
     # Try existing token first
     if os.path.exists(TOKEN_FILE):
         with open(TOKEN_FILE) as f:
             tok = json.load(f)
-        # Check if still valid (with 5 min buffer)
-        if tok.get("expires_in", 0) > 300:
+        # expires_in is a static number — check actual age using obtained_at
+        obtained_at = tok.get("obtained_at", 0)
+        expires_in = tok.get("expires_in", 0)
+        if obtained_at > 0 and (time.time() - obtained_at) < (expires_in - 300):
             return tok["access_token"]
 
     # Get fresh token
@@ -86,8 +89,13 @@ def get_token():
     )
     resp.raise_for_status()
     tok = resp.json()
-    with open(TOKEN_FILE, "w") as f:
-        json.dump(tok, f, indent=2)
+    tok["obtained_at"] = time.time()
+    # Persist token locally if filesystem is writable (skip on Vercel)
+    try:
+        with open(TOKEN_FILE, "w") as f:
+            json.dump(tok, f, indent=2)
+    except OSError:
+        pass
     return tok["access_token"]
 
 
