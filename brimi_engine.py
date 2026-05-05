@@ -27,7 +27,8 @@ from raw_to_compiled import build_brimi_sheet, load_fund_map, norm, strip_tr
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-TMP_DIR = os.path.join(BASE_DIR, "tmp")
+# Use /tmp for all working files — /var/task is read-only on Vercel
+TMP_DIR = "/tmp"
 
 
 def _ensure_tmp():

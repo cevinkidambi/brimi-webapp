@@ -16,8 +16,8 @@ if PROJECT_ROOT not in sys.path:
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 50 * 1024 * 1024
 
-TMP_DIR = os.path.join(PROJECT_ROOT, "tmp")
-os.makedirs(TMP_DIR, exist_ok=True)
+# Use /tmp for uploads — /var/task is read-only on Vercel
+TMP_DIR = "/tmp"
 
 # ─── Inlined HTML (replaces templates/index.html) ──────────────────────────
 def serve_page(today):
