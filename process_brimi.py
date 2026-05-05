@@ -401,10 +401,12 @@ def _uniq(*args) -> list:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def rank_quartile(values: list) -> list[tuple]:
-    """Rank values descending, assign quartile using Excel-style thresholds.
+    """Rank values descending, assign quartile using Excel QUARTILE thresholds on ranks.
 
-    T_q = q * (n-1) / 4 + 1 for q in {1,2,3}
-    Q = smallest q where rank < T_q, default 4
+    Matches the reference Excel:
+      1. RANK(value, range) — ties get same rank (RANK.EQ behavior)
+      2. T_q = QUARTILE(ranks, q) — uses PERCENTILE.INC interpolation
+      3. Q = IF(rank < T1, 1, IF(rank < T2, 2, IF(rank < T3, 3, 4)))
     """
     n = len(values)
     valid = [(i, float(v)) for i, v in enumerate(values)
@@ -414,20 +416,49 @@ def rank_quartile(values: list) -> list[tuple]:
         return result
     total = len(valid)
     sorted_valid = sorted(valid, key=lambda x: x[1], reverse=True)
-    # Excel-style RANK: tied values get the same rank (highest position)
+    # Excel RANK: tied values get same rank (highest position = RANK.EQ)
+    ranks = [None] * n
     rank = 1
     for pos, (idx, val) in enumerate(sorted_valid):
         if pos > 0 and val == sorted_valid[pos - 1][1]:
-            pass  # same rank as previous (tie)
+            pass  # tie: same rank
         else:
             rank = pos + 1
-        # Quartile thresholds: T_q = q*(n-1)/4 + 1
-        q = 4
-        for candidate in (1, 2, 3):
-            if rank < candidate * (total - 1) / 4 + 1:
-                q = candidate
-                break
-        result[idx] = (rank, q)
+        ranks[idx] = rank
+
+    # Excel QUARTILE = PERCENTILE.INC: position = q * (n-1) / 4
+    sorted_ranks = sorted(r for r in ranks if r is not None)
+    def quartile(q):
+        pos = q * (total - 1) / 4
+        lo = int(math.floor(pos))
+        hi = int(math.ceil(pos))
+        if lo == hi:
+            return sorted_ranks[lo]
+        frac = pos - lo
+        return sorted_ranks[lo] + frac * (sorted_ranks[hi] - sorted_ranks[lo])
+
+    t1 = quartile(1)
+    t2 = quartile(2)
+    t3 = quartile(3)
+
+    # Single fund group: always Q1
+    if total == 1:
+        idx = valid[0][0]
+        result[idx] = (1, 1)
+        return result
+
+    for i, r in enumerate(ranks):
+        if r is None:
+            continue
+        if r < t1:
+            q = 1
+        elif r < t2:
+            q = 2
+        elif r < t3:
+            q = 3
+        else:
+            q = 4
+        result[i] = (r, q)
     return result
 
 
@@ -587,16 +618,78 @@ def process(input_path: str, output_path: str,
         ppt_df["is_benchmark"] = False
     ppt_df["is_benchmark"] = ppt_df["is_benchmark"].fillna(False).astype(bool)
 
-    # Rank by quartile periods within each group (local ranking)
-    for group, grp in ppt_df[~ppt_df["is_benchmark"]].groupby("group", sort=False):
+    # ── Quartile ranking using reference Excel groups ─────────────────────
+    # The reference "NEW VS MI2" sheet defines 26 fund groups. Quartile
+    # thresholds depend on ranking ALL funds in each group, not just our 28.
+    # Build a lookup: norm(name) -> {rank, quartile} per period.
+    REF_GROUPS_FILE = os.path.join(os.path.dirname(__file__), "quartile_group_mapping.json")
+    if os.path.exists(REF_GROUPS_FILE):
+        with open(REF_GROUPS_FILE) as f:
+            _gm = json.load(f)
+        _name_to_gi = _gm["name_to_group"]
+        _group_funds = {int(k): v for k, v in _gm["group_funds"].items()}
+
+        # Build D-1 lookup: norm(name) -> {period_col: value}
+        _d1_by_name = {}
+        for _, r in d1.iterrows():
+            _d1_by_name[norm(str(r.iloc[0]))] = {
+                "3 Bln(%)": r.get("3 Bln(%)"),
+                "6 Bln(%)": r.get("6 Bln(%)"),
+                "1 Thn(%)": r.get("1 Thn(%)"),
+                "YTD(%)": r.get("YTD(%)"),
+            }
+
+        _quartile_lookup = {}
+        for gi, g_norm_names in _group_funds.items():
+            for period_col in ["3 Bln(%)", "6 Bln(%)", "1 Thn(%)", "YTD(%)"]:
+                # Get values for all funds in this group
+                items = []
+                for n in g_norm_names:
+                    val = _d1_by_name.get(n, {}).get(period_col)
+                    items.append(val)
+                rq = rank_quartile(items)
+                for n, (rank, q) in zip(g_norm_names, rq):
+                    if rank is not None:
+                        _quartile_lookup.setdefault(n, {})[period_col] = (rank, q)
+
+        # Also index by TR → non-TR alias for funds that exist in D-1
+        # without " - total return*" suffix. Only add if non-TR name doesn't
+        # already have its own entry (both may be in the same group).
+        for tr_name, entry in list(_quartile_lookup.items()):
+            non_tr = tr_name.replace(" - total return*", "").strip()
+            if non_tr and non_tr != tr_name and non_tr in _d1_by_name and non_tr not in _quartile_lookup:
+                _quartile_lookup[non_tr] = entry
+    else:
+        _quartile_lookup = {}
+
+    # Apply quartile to our 28 BRI funds
+    for idx, f in ppt_df.iterrows():
+        if f.get("is_benchmark"):
+            continue
+        display = f["display_name"]
+        # Try display_name first, then brimi_alias, then TR variant
+        candidates = [norm(display)]
+        alias = f.get("brimi_alias")
+        if alias:
+            candidates.append(norm(alias))
+        # Also try appending " - total return*" for funds where reference uses TR name
+        candidates.append(norm(display) + " - total return*")
+
+        entry = {}
+        for c in candidates:
+            e = _quartile_lookup.get(c, {})
+            if e:
+                entry = e
+                break
+
         for period_col, q_col in [
             ("3 Bln(%)", "Quartile_3Bln"),
             ("6 Bln(%)", "Quartile_6Bln"),
             ("1 Thn(%)", "Quartile"),
             ("YTD(%)", "Quartile_YTD"),
         ]:
-            rq = rank_quartile(grp[period_col].tolist())
-            ppt_df.loc[grp.index, q_col] = [q for _, q in rq]
+            if period_col in entry:
+                ppt_df.loc[idx, q_col] = entry[period_col][1]
 
     # Scoring API: Score 1Y from rankoneyearUrl
     scoring_lookup = _fetch_scoring_by_name()
