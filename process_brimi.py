@@ -94,6 +94,15 @@ BLOOMBERG_NAMES = {"MSCI World Islamic Index", "MSCI Indonesia ESG Screened",
 QUARTILE_LABELS = {1: "Q1", 2: "Q2", 3: "Q3", 4: "Q4"}
 QUARTILE_COLORS = {"Q1": "70AD47", "Q2": "FFC000", "Q3": "ED7D31", "Q4": "FF0000"}
 
+# Scoring API rank-to-score mapping
+SCORING_SCORE = {
+    1: "0", 2: "1-", 3: "1", 4: "1+",
+    5: "2-", 6: "2", 7: "2+",
+    8: "3-", 9: "3", 10: "3+",
+    11: "4-", 12: "4", 13: "4+",
+    14: "5-", 15: "5",
+}
+
 FUND_MAP: dict = {}
 
 
@@ -521,20 +530,42 @@ def process(input_path: str, output_path: str,
     ppt_df = pd.DataFrame(ppt_rows)
     ppt_df["Score 1Y"] = None
     ppt_df["Quartile"] = None
+    ppt_df["Quartile_3Bln"] = None
+    ppt_df["Quartile_6Bln"] = None
+    ppt_df["Quartile_YTD"] = None
     if "is_benchmark" not in ppt_df.columns:
         ppt_df["is_benchmark"] = False
     ppt_df["is_benchmark"] = ppt_df["is_benchmark"].fillna(False).astype(bool)
+
+    # Rank by quartile periods within each group
     for group, grp in ppt_df[~ppt_df["is_benchmark"]].groupby("group", sort=False):
-        rq = rank_quartile(grp["1 Thn(%)"].tolist())
-        ppt_df.loc[grp.index, "Score 1Y"] = [r for r, _ in rq]
-        ppt_df.loc[grp.index, "Quartile"] = [q for _, q in rq]
+        for period_col, q_col in [
+            ("3 Bln(%)", "Quartile_3Bln"),
+            ("6 Bln(%)", "Quartile_6Bln"),
+            ("1 Thn(%)", "Quartile"),
+            ("YTD(%)", "Quartile_YTD"),
+        ]:
+            rq = rank_quartile(grp[period_col].tolist())
+            ppt_df.loc[grp.index, "Score 1Y" if q_col == "Quartile" else q_col] = [r for r, _ in rq]
+            if q_col == "Quartile":
+                ppt_df.loc[grp.index, "Quartile"] = [q for _, q in rq]
+
+    # Compute since_inception: (NAV / 100 - 1) * 100
+    ppt_df["since_inception"] = None
+    for idx, f in ppt_df.iterrows():
+        nav = f.get("NAB/UP")
+        if nav is not None and not (isinstance(nav, float) and math.isnan(nav)):
+            try:
+                ppt_df.loc[idx, "since_inception"] = (float(nav) / 100 - 1) * 100
+            except (TypeError, ValueError):
+                pass
 
     # ── Write ─────────────────────────────────────────────────────────────
     print(f"Writing            : {output_path}")
     wb_out = openpyxl.Workbook()
     wb_out.remove(wb_out.active)
     write_page_table(wb_out, pt_df, nav_date_str)
-    write_perf_table(wb_out, ppt_df)
+    write_perf_table(wb_out, ppt_df, nav_date_str)
     wb_out.save(output_path)
     print("Done.")
 
@@ -726,10 +757,13 @@ PPT_DATA_COLS = ["1 Hr(%)", "1 Mgg(%)", "1 Bln(%)", "3 Bln(%)",
                  "6 Bln(%)", "YTD(%)", "1 Thn(%)", "3 Thn(%)", "5 Thn(%)"]
 PPT_HEADERS   = ["Nama", "NAB/UP", "1 Hr (%)", "1 Mgg (%)", "1 Bln (%)",
                  "3 Bln (%)", "6 Bln (%)", "YTD (%)", "1 Thn (%)", "3 Thn (%)",
-                 "5 Thn (%)", "Since Inception", "AUM (Rp Miliar)", "Score 1Y", "Quartile"]
+                 "5 Thn (%)", "Since Inception", "SI Date", "AUM (Rp Miliar)",
+                 "Score 1Y", "Quartile 3Bln", "Quartile 6Bln", "Quartile 1Y",
+                 "Quartile YTD"]
 
 
-def write_perf_table(wb, df):
+def write_perf_table(wb, df, nav_date_str=None):
+    """Write NEW PERFORMANCE TABLE (output) sheet with all columns."""
     ws  = wb.create_sheet("NEW PERFORMANCE TABLE (output)")
     row = 1
     CS  = 4   # start at column D
@@ -739,12 +773,21 @@ def write_perf_table(wb, df):
     ws.cell(row, CS).font = Font(bold=True, size=12)
     row += 2
 
+    # Row 6: main headers
     for ci, h in enumerate(PPT_HEADERS, CS):
         c = ws.cell(row, ci, h)
         c.font      = Font(bold=True, color="FFFFFF", size=9)
         c.fill      = PatternFill("solid", fgColor="1F4E79")
         c.alignment = Alignment(horizontal="center", wrap_text=True)
     ws.row_dimensions[row].height = 32
+    row += 1
+
+    # Row 7: sub-headers under Quartile columns
+    for ci, label in enumerate(["3 Bln", "6 Bln", "1Y", "YTD"], CS + NC - 4):
+        c = ws.cell(row, ci, label)
+        c.font      = Font(bold=True, color="FFFFFF", size=8)
+        c.fill      = PatternFill("solid", fgColor="1F4E79")
+        c.alignment = Alignment(horizontal="center")
     row += 1
 
     prev_group = None
@@ -761,17 +804,33 @@ def write_perf_table(wb, df):
             row += 1
             prev_group = group
 
-        q_val   = f.get("Quartile")
-        q_label = QUARTILE_LABELS.get(int(q_val)) if q_val is not None and not (isinstance(q_val, float) and math.isnan(q_val)) else None
-        score   = f.get("Score 1Y")
+        # Quartile labels
+        q_3bln  = f.get("Quartile_3Bln")
+        q_6bln  = f.get("Quartile_6Bln")
+        q_1y    = f.get("Quartile")
+        q_ytd   = f.get("Quartile_YTD")
+        q_lbl = lambda v: QUARTILE_LABELS.get(int(v)) if v is not None and not (isinstance(v, float) and math.isnan(v)) else None
+
+        # Score 1Y: convert rank to API score string
+        score_rank = f.get("Score 1Y")
+        if score_rank is not None and not (isinstance(score_rank, float) and math.isnan(score_rank)):
+            score_str = SCORING_SCORE.get(int(score_rank), str(int(score_rank)))
+        elif f.get("is_benchmark"):
+            score_str = None
+        else:
+            score_str = "No Score"
+
+        # SI Date
+        si_date = f.get("si_date", "")
 
         vals = (
             [f["display_name"], _fmt(f.get("NAB/UP"))]
             + [_fmt(f.get(c)) for c in PPT_DATA_COLS]
             + [_fmt(f.get("since_inception")),
+               si_date if si_date else None,
                _fmt(f.get("AUM")),
-               int(score) if score is not None and not (isinstance(score, float) and math.isnan(score)) else None,
-               q_label]
+               score_str,
+               q_lbl(q_3bln), q_lbl(q_6bln), q_lbl(q_1y), q_lbl(q_ytd)]
         )
         for ci, v in enumerate(vals, CS):
             cell = ws.cell(row, ci, v)
@@ -787,11 +846,14 @@ def write_perf_table(wb, df):
             for c in range(CS, CS + NC):
                 ws.cell(row, c).fill = PatternFill("solid", fgColor="EBF3FB")
 
-        if q_label in QUARTILE_COLORS:
-            qc = ws.cell(row, CS + NC - 1)
-            qc.fill      = PatternFill("solid", fgColor=QUARTILE_COLORS[q_label])
-            qc.font      = Font(bold=True, color="FFFFFF", size=9)
-            qc.alignment = Alignment(horizontal="center")
+        # Color quartile cells
+        for qi, q_val in enumerate([q_3bln, q_6bln, q_1y, q_ytd]):
+            q_label = q_lbl(q_val)
+            if q_label in QUARTILE_COLORS:
+                qc = ws.cell(row, CS + NC - 4 + qi)
+                qc.fill      = PatternFill("solid", fgColor=QUARTILE_COLORS[q_label])
+                qc.font      = Font(bold=True, color="FFFFFF", size=9)
+                qc.alignment = Alignment(horizontal="center")
 
         row += 1
 
@@ -799,7 +861,7 @@ def write_perf_table(wb, df):
     ws.column_dimensions["E"].width = 12
     for ci in range(6, CS + NC):
         ws.column_dimensions[get_column_letter(ci)].width = 12
-    ws.freeze_panes = "D5"
+    ws.freeze_panes = "D6"
 
 
 # ─────────────────────────────────────────────────────────────────────────────

@@ -1624,7 +1624,8 @@
         "group": "Equity",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "1996-07-05"
       },
       {
         "display_name": "BRI Mawar Konsumer 10 Kelas A",
@@ -1632,7 +1633,8 @@
         "group": "Equity",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2011-02-16"
       },
       {
         "display_name": "BRI Mawar Fokus 10",
@@ -1640,7 +1642,8 @@
         "group": "Equity",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2010-03-02"
       },
       {
         "display_name": "BRI Mawar Komoditas 10",
@@ -1648,7 +1651,8 @@
         "group": "Equity",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2011-02-16"
       },
       {
         "display_name": "BRI Mawar Ekuitas Plus",
@@ -1656,7 +1660,8 @@
         "group": "Equity",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2015-04-14"
       },
       {
         "display_name": "BRI Mawar Ekuitas Utama",
@@ -1664,7 +1669,8 @@
         "group": "Equity",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2017-10-02"
       },
       {
         "display_name": "BRI G20 Sharia Equity Fund Dollar",
@@ -1672,7 +1678,8 @@
         "group": "Equity",
         "is_price_return": false,
         "is_usd": true,
-        "active": true
+        "active": true,
+        "si_date": "2019-11-26"
       },
       {
         "display_name": "BRI Syariah Saham",
@@ -1680,7 +1687,8 @@
         "group": "Equity",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2014-09-18"
       },
       {
         "display_name": "BRI Indeks Syariah",
@@ -1688,7 +1696,8 @@
         "group": "Equity",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2006-04-05"
       },
       {
         "display_name": "BRI ETF Indonesia Top 40",
@@ -1696,7 +1705,8 @@
         "group": "Equity",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2018-04-23"
       },
       {
         "display_name": "BRI MSCI Indonesia ESG Screened Kelas A",
@@ -1704,7 +1714,8 @@
         "group": "Equity",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2022-09-07"
       },
       {
         "display_name": "BRI MSCI Indonesia ESG Screened Kelas B",
@@ -1712,7 +1723,8 @@
         "group": "Equity",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2022-07-15"
       },
       {
         "display_name": "BRI Anggrek Fleksibel",
@@ -1720,7 +1732,8 @@
         "group": "Balanced",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2004-05-17"
       },
       {
         "display_name": "BRI Balanced Regular Income Fund Kelas A",
@@ -1728,7 +1741,8 @@
         "group": "Balanced",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2019-07-01"
       },
       {
         "display_name": "BRI Balanced Regular Income Fund Kelas A - Price Return",
@@ -1736,7 +1750,8 @@
         "group": "Balanced",
         "is_price_return": true,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2019-07-01"
       },
       {
         "display_name": "BRI Syariah Berimbang",
@@ -1744,7 +1759,8 @@
         "group": "Balanced",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2000-12-01"
       },
       {
         "display_name": "BRI Pendapatan Tetap Indonesia Sehat",
@@ -1752,7 +1768,8 @@
         "group": "Fixed Income",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2016-12-01"
       },
       {
         "display_name": "BRI Melati Pendapatan Utama",
@@ -1760,7 +1777,8 @@
         "group": "Fixed Income",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2012-09-27"
       },
       {
         "display_name": "BRI Brawijaya Abadi Pendapatan Tetap",
@@ -1768,7 +1786,8 @@
         "group": "Fixed Income",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2019-02-25"
       },
       {
         "display_name": "BRI Gebyar Indonesia II",
@@ -1776,7 +1795,8 @@
         "group": "Fixed Income",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2008-04-23"
       },
       {
         "display_name": "BRI Pendapatan Prima Plus",
@@ -1784,7 +1804,8 @@
         "group": "Fixed Income",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2010-06-22"
       },
       {
         "display_name": "BRI Melati Premium Dollar",
@@ -1792,7 +1813,8 @@
         "group": "Fixed Income",
         "is_price_return": false,
         "is_usd": true,
-        "active": true
+        "active": true,
+        "si_date": "2007-02-19"
       },
       {
         "display_name": "BRI Seruni Pasar Uang II Kelas A",
@@ -1800,7 +1822,8 @@
         "group": "Money Market",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2008-02-06"
       },
       {
         "display_name": "BRI Seruni Pasar Uang III",
@@ -1808,7 +1831,8 @@
         "group": "Money Market",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2010-02-01"
       },
       {
         "display_name": "BRI Gamasteps Pasar Uang",
@@ -1816,7 +1840,8 @@
         "group": "Money Market",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2022-10-19"
       },
       {
         "display_name": "BRI Seruni Pasar Uang Syariah",
@@ -1824,7 +1849,8 @@
         "group": "Money Market",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2018-07-24"
       },
       {
         "display_name": "BRI Gebyar Dana Likuid",
@@ -1832,7 +1858,8 @@
         "group": "Money Market",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2007-07-10"
       },
       {
         "display_name": "BRI Seruni Likuid Dolar",
@@ -1840,7 +1867,8 @@
         "group": "Money Market",
         "is_price_return": false,
         "is_usd": false,
-        "active": true
+        "active": true,
+        "si_date": "2025-07-10"
       }
     ]
   }
