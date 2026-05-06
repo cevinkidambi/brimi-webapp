@@ -2,6 +2,7 @@
 api/index.py — Vercel entrypoint for BRIMI Flask app.
 All HTML inlined — no templates folder (Vercel only deploys api/ files).
 """
+import json
 import os
 import sys
 import uuid
@@ -422,7 +423,17 @@ def serve_admin_page():
         async function load() {
             try {
                 const r = await fetch('/admin/config');
-                config = await r.json();
+                if (!r.ok) {
+                    const text = await r.text();
+                    toast(`Failed to load (${r.status}): ${text.substring(0, 200)}`);
+                    return;
+                }
+                const data = await r.json();
+                if (data.status !== 'ok') {
+                    toast('Failed to load: ' + (data.message || 'Unknown error'));
+                    return;
+                }
+                config = data;
                 render();
             } catch (e) { toast('Failed to load: ' + e.message); }
         }
