@@ -4,15 +4,7 @@
   "builds": [
     {
       "src": "api/index.py",
-      "use": "@vercel/python",
-      "config": {
-        "includeFiles": [
-          "fund_universe.json",
-          "quartile_group_mapping.json",
-          "process_brimi.py",
-          "fetch_investdata.py"
-        ]
-      }
+      "use": "@vercel/python"
     }
   ],
   "routes": [
