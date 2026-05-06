@@ -477,7 +477,7 @@ def serve_admin_page():
                 });
 
                 bodyHtml += `<div class="add-row">
-                    <input type="text" id="add-${si}" placeholder="Fund name (exact match from D-1)..." onkeydown="if(event.key==='Enter')addPeer(${si})">
+                    <input type="text" id="add-${si}" placeholder="Fund name (exact match with fund universe)..." onkeydown="if(event.key==='Enter')addPeer(${si})">
                     <button onclick="addPeer(${si})">Add</button>
                 </div></div>`;
 
