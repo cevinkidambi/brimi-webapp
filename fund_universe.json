@@ -1478,7 +1478,7 @@
             "active": true
           },
           {
-            "display_name": "Ashmore Dana Obligasi Nusantara Kelas A - Total Return*",
+            "display_name": "Schroder Dana Mantap Plus II",
             "alias": null,
             "is_index": false,
             "active": true
@@ -1490,14 +1490,26 @@
             "active": true
           },
           {
-            "display_name": "Bahana Pendapatan Tetap Makara Prima Kelas G",
+            "display_name": "Bahana Obligasi Kehati Lestari Kelas G",
             "alias": null,
             "is_index": false,
             "active": true
           },
           {
-            "display_name": "Trimegah Fixed Income Plan - Total Return*",
+            "display_name": "Schroder Prestasi Gebyar Indonesia II",
             "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Panin Gebyar Indonesia II",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Eastspring Investments IDR High Grade Kelas A - Total Return*",
+            "alias": "Eastspring Investments IDR High Grade Kelas A - Total Return*",
             "is_index": false,
             "active": true
           },
@@ -1508,14 +1520,14 @@
             "active": true
           },
           {
-            "display_name": "Bahana Obligasi Ganesha Kelas D - Total Return*",
-            "alias": null,
+            "display_name": "Ashmore Dana Obligasi Nusantara Kelas A - Total Return*",
+            "alias": "Ashmore Dana Obligasi Nusantara Kelas A - Total Return*",
             "is_index": false,
             "active": true
           },
           {
-            "display_name": "Schroder Dana Mantap Plus II",
-            "alias": null,
+            "display_name": "Manulife Obligasi Negara Indonesia II Kelas Income 1",
+            "alias": "Manulife Obligasi Negara Indonesia II Kelas Income 1 - Total Return*",
             "is_index": false,
             "active": true
           },

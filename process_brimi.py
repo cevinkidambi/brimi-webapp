@@ -220,9 +220,32 @@ def _section_source(section: dict) -> str:
     return "d1"
 
 
+def _apply_peer_overrides(universe: dict):
+    """Merge peer_overrides.json into universe page_table sections.
+
+    Overrides are stored in the git repo via GitHub API (committed by admin page).
+    Each override matches a section by name and replaces its funds list.
+    """
+    overrides_path = os.path.join(os.path.dirname(__file__), "peer_overrides.json")
+    if not os.path.exists(overrides_path):
+        return
+
+    with open(overrides_path) as f:
+        overrides = json.load(f)
+
+    section_overrides = {s["section"]: s for s in overrides.get("sections", [])}
+    for si, section in enumerate(universe["page_table"]["sections"]):
+        if section["section"] in section_overrides:
+            override = section_overrides[section["section"]]
+            # Match by section name — if multiple sections share a name,
+            # apply all override funds to each matching section
+            section["funds"] = override.get("funds", section["funds"])
+
+
 def get_page_table_config(universe: dict) -> list[dict]:
     """Flatten universe → page_table into a list of fund dicts.
     Each entry gets a unique section_idx for independent ranking."""
+    _apply_peer_overrides(universe)
     entries = []
     for si, section in enumerate(universe["page_table"]["sections"]):
         source = _section_source(section)
