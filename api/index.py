@@ -69,6 +69,15 @@ def serve_page(today):
         }}
         header .subtitle {{ font-size: 14px; color: #666; }}
         header .date {{ font-size: 13px; color: #888; margin-top: 8px; font-weight: 500; }}
+        header .admin-link {{
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            font-size: 13px;
+            color: #999;
+            text-decoration: none;
+        }}
+        header .admin-link:hover {{ color: var(--md-sys-color-primary-dark); }}
         .card {{
             background: var(--md-sys-color-surface);
             border: 1px solid var(--md-sys-color-outline);
@@ -165,6 +174,7 @@ def serve_page(today):
             <h1>BRIMI BRIMI! HAHAHA!</h1>
             <p class="subtitle">Fund Performance Automation</p>
             <p class="date">{today}</p>
+            <a class="admin-link" href="/admin">Manage Peers</a>
         </header>
         <div class="card">
             <form id="uploadForm" enctype="multipart/form-data">
