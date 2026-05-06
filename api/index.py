@@ -561,17 +561,16 @@ def admin_config():
         with open(universe_path) as f:
             universe = json.load(f)
 
-        # Apply any existing overrides
+        # Apply any existing overrides (matched by section index)
         overrides_path = os.path.join(PROJECT_ROOT, "peer_overrides.json")
         if os.path.exists(overrides_path):
             with open(overrides_path) as f:
                 overrides = json.load(f)
-            section_map = {s["section"]: s for s in overrides.get("sections", [])}
-            for section in universe["page_table"]["sections"]:
-                if section["section"] in section_map:
-                    section["funds"] = section_map[section["section"]].get("funds", section["funds"])
+            for idx, section in enumerate(universe["page_table"]["sections"]):
+                if str(idx) in overrides.get("sections", {}):
+                    section["funds"] = overrides["sections"][str(idx)]
 
-        # Build response: one entry per unique section name with its funds
+        # Build response: one entry per section (including duplicates) with its funds
         result = []
         for section in universe["page_table"]["sections"]:
             result.append({
@@ -586,7 +585,8 @@ def admin_config():
 
 @app.route("/admin/save", methods=["POST"])
 def admin_save():
-    """Save peer config — only diffs vs fund_universe.json, committed via GitHub API."""
+    """Save peer config — only diffs vs fund_universe.json, committed via GitHub API.
+    Overrides stored as {section_index: [funds]} dict to handle duplicate section names."""
     try:
         import base64
         data = request.get_json()
@@ -598,28 +598,28 @@ def admin_save():
         with open(universe_path) as f:
             base_universe = json.load(f)
 
-        # Build lookup: section_name -> list of fund dicts from base universe
-        base_sections = {}
-        for section in base_universe["page_table"]["sections"]:
-            name = section["section"]
-            if name not in base_sections:
-                base_sections[name] = []
-            base_sections[name].extend(section["funds"])
+        base_sections = base_universe["page_table"]["sections"]
+        incoming = data["sections"]
 
-        # Diff incoming sections against base — only keep changed ones
-        overrides = []
-        for sec in data["sections"]:
-            name = sec["section"]
-            incoming = sec.get("funds", [])
-            base = base_sections.get(name, [])
+        # Compare each section by index (handles duplicate section names correctly)
+        # Store overrides as {"0": [funds], "5": [funds]} — dict keyed by section index
+        overrides = {}
+        for i in range(len(base_sections)):
+            if i >= len(incoming):
+                break
+            sec_in = incoming[i]
+            sec_base = base_sections[i]
+            if sec_in["section"] != sec_base["section"]:
+                continue
 
-            # Normalise for comparison: strip 'active' since base may not have it
+            # Normalise for comparison: strip 'active' field
             def norm(funds):
                 return [{k: f[k] for k in ("display_name", "alias", "is_index")
                          if k in f} for f in funds]
 
-            if norm(incoming) != norm(base):
-                overrides.append({"section": name, "funds": incoming})
+            if norm(sec_in.get("funds", [])) != norm(sec_base.get("funds", [])):
+                # Store just the fund dicts list, keyed by index
+                overrides[str(i)] = sec_in["funds"]
 
         # If no overrides, delete peer_overrides.json from GitHub
         if not overrides:
@@ -647,7 +647,7 @@ def admin_save():
 
             return jsonify({"status": "ok", "message": "No overrides file to clear"})
 
-        content = json.dumps({"sections": overrides}, indent=2, ensure_ascii=False)
+        content = json.dumps(overrides, indent=2, ensure_ascii=False)
 
         # Commit to GitHub
         github_token = os.environ.get("GITHUB_TOKEN")
@@ -656,7 +656,7 @@ def admin_save():
             overrides_path = os.path.join(PROJECT_ROOT, "peer_overrides.json")
             with open(overrides_path, "w") as f:
                 f.write(content)
-            return jsonify({"status": "ok", "message": f"Saved locally ({len(overrides)} changed section(s))"})
+            return jsonify({"status": "ok", "message": f"Saved locally ({len(overrides)} section(s) changed)"})
 
         owner = os.environ.get("GITHUB_REPO_OWNER", "cevinkidambi")
         repo = os.environ.get("GITHUB_REPO_NAME", "brimi-webapp")
