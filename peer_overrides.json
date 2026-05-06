@@ -1,0 +1,52 @@
+{
+  "0": [
+    {
+      "active": true,
+      "alias": null,
+      "display_name": "Schroder Dana Prestasi Plus",
+      "is_index": false
+    },
+    {
+      "active": true,
+      "alias": null,
+      "display_name": "BRI Mawar",
+      "is_index": false
+    },
+    {
+      "active": true,
+      "alias": "Ashmore Dana Ekuitas Nusantara - Total Return*",
+      "display_name": "Ashmore Dana Ekuitas Nusantara - Total Return*",
+      "is_index": false
+    },
+    {
+      "active": true,
+      "alias": null,
+      "display_name": "Mandiri Investa Atraktif Kelas B",
+      "is_index": false
+    },
+    {
+      "active": true,
+      "alias": null,
+      "display_name": "Manulife Dana Saham Kelas A",
+      "is_index": false
+    },
+    {
+      "active": true,
+      "alias": null,
+      "display_name": "BNP Paribas Pesona",
+      "is_index": false
+    },
+    {
+      "active": true,
+      "alias": null,
+      "display_name": "Batavia Dana Saham",
+      "is_index": false
+    },
+    {
+      "active": true,
+      "alias": null,
+      "display_name": "LQ45",
+      "is_index": true
+    }
+  ]
+}
