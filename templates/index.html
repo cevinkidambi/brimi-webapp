@@ -1,10 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BRIMI BRIMI! HAHAHA!</title>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500&display=swap"
+        rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
         :root {
@@ -21,7 +24,11 @@
             --md-ref-typeface-plain: 'Roboto', sans-serif;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: var(--md-ref-typeface-plain);
@@ -160,7 +167,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .loading p {
@@ -269,17 +278,26 @@
 
         /* Responsive */
         @media (max-width: 480px) {
-            .container { padding: 16px 12px; }
-            header h1 { font-size: 24px; }
-            .card { padding: 16px; }
+            .container {
+                padding: 16px 12px;
+            }
+
+            header h1 {
+                font-size: 24px;
+            }
+
+            .card {
+                padding: 16px;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
             <h1>BRIMI BRIMI! HAHAHA!</h1>
-            <p class="subtitle">Fund Performance Automation</p>
+            <p class="subtitle">MBG: Measuring BRIMI's Growth</p>
             <p class="date" id="todayDate">{{ today }}</p>
         </header>
 
@@ -442,4 +460,5 @@
         }
     </script>
 </body>
+
 </html>
