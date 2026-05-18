@@ -172,7 +172,7 @@ def serve_page(today):
     <div class="container">
         <header>
             <h1>BRIMI BRIMI! HAHAHA!</h1>
-            <p class="subtitle">Fund Performance Automation</p>
+            <p class="subtitle">MBG: Measuring BRIMI's Growth</p>
             <p class="date">{today}</p>
             <a class="admin-link" href="/admin">Manage Peers</a>
         </header>
