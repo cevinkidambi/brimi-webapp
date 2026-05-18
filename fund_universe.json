@@ -1671,7 +1671,7 @@
         "si_date": "2011-02-16"
       },
       {
-        "display_name": "BRI Mawar Ekuitas Plus",
+        "display_name": "BRI Mawar Ekuitas Plus - Total Return*",
         "brimi_alias": null,
         "group": "Equity",
         "quartile_group": "Q_Equity_BPJS_A",
@@ -1681,7 +1681,7 @@
         "si_date": "2015-04-14"
       },
       {
-        "display_name": "BRI Mawar Ekuitas Utama",
+        "display_name": "BRI Mawar Ekuitas Utama - Total Return*",
         "brimi_alias": "Danareksa Mawar Ekuitas Utama",
         "group": "Equity",
         "quartile_group": "Q_Equity_BPJS_B",
@@ -1741,7 +1741,7 @@
         "si_date": "2022-09-07"
       },
       {
-        "display_name": "BRI MSCI Indonesia ESG Screened Kelas B",
+        "display_name": "BRI MSCI Indonesia ESG Screened Kelas B - Total Return*",
         "brimi_alias": null,
         "group": "Equity",
         "quartile_group": "Q_MSCI_ESG",
@@ -1761,7 +1761,7 @@
         "si_date": "2004-05-17"
       },
       {
-        "display_name": "BRI Balanced Regular Income Fund Kelas A",
+        "display_name": "BRI Balanced Regular Income Fund Kelas A - Total Return*",
         "brimi_alias": "BRI Balanced Regular Income Fund Kelas A",
         "group": "Balanced",
         "quartile_group": "Q_Balanced_ShortDiv",
@@ -1831,7 +1831,7 @@
         "si_date": "2008-04-23"
       },
       {
-        "display_name": "BRI Pendapatan Prima Plus",
+        "display_name": "BRI Pendapatan Prima Plus - Total Return*",
         "brimi_alias": null,
         "group": "Fixed Income",
         "quartile_group": "Q_FixedIncome_Institution",

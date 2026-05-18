@@ -3,11 +3,11 @@
 
   "mappings": [
     {
-      "display_name": "BRI Balanced Regular Income Fund Kelas A",
+      "display_name": "BRI Balanced Regular Income Fund Kelas A - Total Return*",
       "brimi_name": "BRI Balanced Regular Income Fund Kelas A",
       "d1_name": null,
       "nav_name": null,
-      "note": "No alias needed; name is identical in both sources."
+      "note": "TR variant. brimi_name maps to base name for AUM lookup in HistoricalNAV."
     },
     {
       "display_name": "BRI Gamasteps Pasar Uang",
@@ -36,6 +36,13 @@
       "d1_name": null,
       "nav_name": "BRI Pendapatan Prima Plus",
       "note": "Exception: NAV formula uses VLOOKUP($N341, D-1) = alias 'BRI Pendapatan Prima Plus', not display_name. nav_name overrides the NAV lookup."
+    },
+    {
+      "display_name": "BRI Balanced Regular Income Fund Kelas A - Price Return",
+      "brimi_name": null,
+      "d1_name": null,
+      "nav_name": "BRI Balanced Regular Income Fund Kelas A",
+      "note": "Price Return variant not in API. nav_name maps to base fund for NAV lookup. perf lookup uses base fund via strip_tr."
     }
   ],
 

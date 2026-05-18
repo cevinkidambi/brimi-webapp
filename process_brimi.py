@@ -115,8 +115,8 @@ def norm(s: str) -> str:
     return str(s).strip().lower()
 
 def strip_tr(name: str) -> str:
-    """Strip '- Total Return' suffix and trailing asterisks."""
-    s = re.sub(r"\s*-\s*total return\*?\s*$", "", name, flags=re.IGNORECASE).strip()
+    """Strip '- Total Return' or '- Price Return' suffix and trailing asterisks."""
+    s = re.sub(r"\s*-\s*(?:total|price) return\*?\s*$", "", name, flags=re.IGNORECASE).strip()
     return re.sub(r"\*+\s*$", "", s).strip()
 
 
