@@ -1781,8 +1781,8 @@
         "si_date": "2019-07-01"
       },
       {
-        "display_name": "BRI Syariah Berimbang",
-        "brimi_alias": "BRI Syariah Berimbang - Total Return*",
+        "display_name": "BRI Syariah Berimbang - Total Return*",
+        "brimi_alias": "BRI Syariah Berimbang",
         "group": "Balanced",
         "quartile_group": "Q_Balanced_Syariah",
         "is_price_return": false,
