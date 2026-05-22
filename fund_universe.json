@@ -1118,7 +1118,7 @@
         "funds": [
           {
             "display_name": "BRI Balanced Regular Income Fund Kelas A",
-            "alias": "BRI Balanced Regular Income Fund kelas A - Total Return*",
+            "alias": null,
             "is_index": false,
             "active": true
           },
