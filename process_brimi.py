@@ -127,16 +127,27 @@ def strip_tr(name: str) -> str:
 def build_lookup(df: pd.DataFrame, name_col: str = "Nama") -> dict:
     """
     {norm(name): row} — each fund name maps to its own row.
-    No TR auto-promotion: base names and TR names are kept separate.
+    TR entries overwrite base entries so that lookup("X") returns TR data.
+    Original base rows are preserved under "_base:X" keys for lookup_notr.
     """
     lkp: dict = {}
+    tr_keys: set = set()
     for _, row in df.iterrows():
         nm = str(row[name_col]).strip() if pd.notna(row[name_col]) else ""
         if not nm or nm in ("nan", "None"):
             continue
         k = norm(nm)
-        if k not in lkp:
-            lkp[k] = row
+        lkp[k] = row
+        if re.search(r"total return\*?\s*$", k, re.IGNORECASE):
+            tr_keys.add(k)
+    # Promote TR: for each TR key like "X - total return*", store its row
+    # under the base key "X" so lookup("X") returns TR data.
+    # Save original base row under "_base:X" so lookup_notr can find it.
+    for tk in tr_keys:
+        base_k = re.sub(r"\s*-\s*total return\*?\s*$", "", tk, flags=re.IGNORECASE).strip()
+        if base_k and base_k in lkp:
+            lkp[f"_base:{base_k}"] = lkp[base_k]
+            lkp[base_k] = lkp[tk]
     return lkp
 
 
@@ -151,6 +162,10 @@ def lookup(name: str, lkp: dict):
 def lookup_notr(name: str, lkp: dict):
     """Explicitly return the non-TR (base) row, ignoring TR-promoted entries."""
     for candidate in (norm(name), norm(strip_tr(name))):
+        # Check _base: prefix first — this is the original base row before TR promotion
+        base_row = lkp.get(f"_base:{candidate}")
+        if base_row is not None:
+            return base_row
         row = lkp.get(candidate)
         if row is not None:
             row_name = str(row.get("Nama", "")).strip()
