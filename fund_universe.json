@@ -1906,7 +1906,7 @@
         "group": "Money Market",
         "quartile_group": "Q_MM_USD",
         "is_price_return": false,
-        "is_usd": false,
+        "is_usd": true,
         "active": true,
         "si_date": "2025-07-10"
       }
