@@ -751,12 +751,12 @@ def process(input_path: str, output_path: str,
             ppt_df.loc[idx, "Score 1Y"] = "No Score"
 
     # Compute since_inception: (NAV / base - 1) * 100
-    # IDR funds start at 1000, USD funds start at 100
+    # IDR funds start at 1000, USD funds start at 1
     ppt_df["since_inception"] = None
     for idx, f in ppt_df.iterrows():
         nav = f.get("NAB/UP")
         if nav is not None and not (isinstance(nav, float) and math.isnan(nav)):
-            base = 100 if f.get("is_usd") else 1000
+            base = 1 if f.get("is_usd") else 1000
             try:
                 ppt_df.loc[idx, "since_inception"] = (float(nav) / base - 1) * 100
             except (TypeError, ValueError):
