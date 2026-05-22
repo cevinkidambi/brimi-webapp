@@ -152,10 +152,23 @@ def build_lookup(df: pd.DataFrame, name_col: str = "Nama") -> dict:
 
 
 def lookup(name: str, lkp: dict):
-    """Try exact → strip TR → None."""
+    """Try exact → _base: fallback → strip TR → None.
+
+    With TR promotion in build_lookup, the base key maps to TR data.
+    Checking _base: first means plain base names ("X") get base data,
+    while explicit TR names ("X - Total Return*") find their own exact key.
+    Names without an exact match fall back to strip_tr to find TR variants
+    (e.g. "BRI Mawar Ekuitas Plus" → finds TR entry).
+    """
     k = norm(name)
     if k in lkp:
+        # Exact match — could be base key (TR-promoted) or a TR key itself.
+        # Prefer _base: to get the original base row.
+        base_row = lkp.get(f"_base:{k}")
+        if base_row is not None:
+            return base_row
         return lkp[k]
+    # No exact match — try stripping TR suffix.
     return lkp.get(norm(strip_tr(name)))
 
 
