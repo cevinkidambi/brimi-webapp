@@ -22,7 +22,7 @@ import pandas as pd
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl.utils import get_column_letter
-from datetime import datetime
+from datetime import datetime, timedelta
 
 warnings.filterwarnings("ignore")
 
@@ -441,18 +441,18 @@ def compute_insurance_returns(history: list, today_aum: float,
         return None
 
     def _mtd_return():
-        start_of_month = upload_date.replace(day=1)
+        end_of_prev_month = upload_date.replace(day=1) - timedelta(days=1)
         for i, (d, aum) in enumerate(series):
-            if isinstance(d, datetime) and d < start_of_month:
+            if isinstance(d, datetime) and d.date() <= end_of_prev_month.date():
                 if aum and aum != 0:
                     return (series[0][1] - aum) / aum * 100
                 return None
         return None
 
     def _ytd_return():
-        start_of_year = upload_date.replace(month=1, day=1)
+        end_of_prev_year = upload_date.replace(month=1, day=1) - timedelta(days=1)
         for i, (d, aum) in enumerate(series):
-            if isinstance(d, datetime) and d < start_of_year:
+            if isinstance(d, datetime) and d.date() <= end_of_prev_year.date():
                 if aum and aum != 0:
                     return (series[0][1] - aum) / aum * 100
                 return None
@@ -460,13 +460,13 @@ def compute_insurance_returns(history: list, today_aum: float,
 
     return {
         "1 Hr(%)":  _pct_return(1),
-        "1 Mgg(%)": _pct_return(7),
+        "1 Mgg(%)": _pct_return(5),
         "MTD(%)":   _mtd_return(),
-        "1 Bln(%)": _pct_return(30),
-        "3 Bln(%)": _pct_return(90),
-        "6 Bln(%)": _pct_return(180),
+        "1 Bln(%)": _pct_return(19),
+        "3 Bln(%)": _pct_return(56),
+        "6 Bln(%)": _pct_return(119),
         "YTD(%)":   _ytd_return(),
-        "1 Thn(%)": _pct_return(365),
+        "1 Thn(%)": _pct_return(235),
     }
 
 
