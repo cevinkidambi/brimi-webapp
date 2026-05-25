@@ -382,9 +382,9 @@ INS_PERF_COLS = [
 ]
 
 
-def load_insurance(path: str) -> dict:
-    """Load latest rolling returns from insurance.xlsx for 3 insurance funds.
-    Returns {display_name: {"NAB/UP": None, "1 Hr(%)": val, ...}}.
+def load_insurance_history(path: str) -> dict:
+    """Load historical AUM series from insurance.xlsx for 3 insurance funds.
+    Returns {display_name: [(date, aum), ...]} sorted by date descending.
     """
     if not os.path.exists(path):
         print(f"  insurance.xlsx not found at {path}")
@@ -393,26 +393,71 @@ def load_insurance(path: str) -> dict:
     ws = wb["Sheet1"]
     rows = list(ws.iter_rows(values_only=True))
     wb.close()
-    if len(rows) < 3:
+    if len(rows) < 2:
         return {}
 
-    # Headers at row 1 (index 0), data starts at row 2 (index 1)
-    hdr = rows[0]
     out = {}
     for col_start, display_name in INS_BLOCKS:
-        # Latest data is at row index 1 (first data row after header)
-        r = rows[1]
-        entry = {"NAB/UP": None}
-        # Columns: Date(0), FundID(1), FundName(2), NAV(3), AUM(4), OutUnits(5),
-        #          1Hr(6), 1Mgg(7), MTD(8), 1Bln(9), 3Bln(10), 6Bln(11), YTD(12), 1Thn(13)
-        for i, perf_col in enumerate(INS_PERF_COLS):
-            ci = col_start + 6 + i
-            if ci < len(r):
-                entry[perf_col] = r[ci]
-            else:
-                entry[perf_col] = None
-        out[display_name] = entry
+        history = []
+        for r in rows[1:]:  # skip header
+            date_val = r[col_start]
+            aum_val = r[col_start + 4]  # AUM is 4 cols after Date
+            if date_val and aum_val:
+                history.append((date_val, float(aum_val)))
+        # Sort by date descending (newest first)
+        history.sort(key=lambda x: x[0], reverse=True)
+        out[display_name] = history
     return out
+
+
+def compute_insurance_returns(history: list, today_aum: float) -> dict:
+    """Compute rolling returns from historical AUM series + today's AUM.
+    history: [(date, aum), ...] sorted by date descending
+    today_aum: AUM from today's BRIMI upload
+    Returns {"1 Hr(%)": val, ...} in % format.
+    """
+    # Build full series: today + historical
+    series = [(datetime.today(), today_aum)] + history
+
+    def _pct_return(days_back):
+        if len(series) <= days_back:
+            return None
+        current = series[0][1]
+        past = series[days_back][1]
+        if past and past != 0:
+            return (current - past) / past * 100
+        return None
+
+    def _mtd_return():
+        today = datetime.today()
+        start_of_month = today.replace(day=1)
+        for i, (d, aum) in enumerate(series):
+            if isinstance(d, datetime) and d < start_of_month:
+                if aum and aum != 0:
+                    return (series[0][1] - aum) / aum * 100
+                return None
+        return None
+
+    def _ytd_return():
+        today = datetime.today()
+        start_of_year = today.replace(month=1, day=1)
+        for i, (d, aum) in enumerate(series):
+            if isinstance(d, datetime) and d < start_of_year:
+                if aum and aum != 0:
+                    return (series[0][1] - aum) / aum * 100
+                return None
+        return None
+
+    return {
+        "1 Hr(%)":  _pct_return(1),
+        "1 Mgg(%)": _pct_return(7),
+        "MTD(%)":   _mtd_return(),
+        "1 Bln(%)": _pct_return(30),
+        "3 Bln(%)": _pct_return(90),
+        "6 Bln(%)": _pct_return(180),
+        "YTD(%)":   _ytd_return(),
+        "1 Thn(%)": _pct_return(365),
+    }
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -691,11 +736,11 @@ def process(input_path: str, output_path: str,
     wb_in          = openpyxl.load_workbook(input_path, data_only=True)
     bloomberg_data = load_bloomberg(wb_in)
     unitlink_data  = load_unitlink(wb_in)
-    insurance_data = load_insurance(os.path.join(PROJECT_ROOT, "insurance.xlsx"))
+    insurance_hist = load_insurance_history(os.path.join(PROJECT_ROOT, "insurance.xlsx"))
     if unitlink_data:
         print(f"Unitlink funds     : {len(unitlink_data)}")
-    if insurance_data:
-        print(f"Insurance funds    : {len(insurance_data)}")
+    if insurance_hist:
+        print(f"Insurance funds    : {len(insurance_hist)} (historical data)")
 
     pt_cfg  = get_page_table_config(universe)
     ppt_cfg = get_perf_table_config(universe)
@@ -714,10 +759,11 @@ def process(input_path: str, output_path: str,
         if f["display_name"] in unitlink_data:
             ul = unitlink_data[f["display_name"]]
             perf.update(ul)  # includes NAB/UP from singlePrice
-        # Override perf with insurance data for insurance funds
-        if f["display_name"] in insurance_data:
-            ins = insurance_data[f["display_name"]]
-            perf.update({k: v for k, v in ins.items() if k != "NAB/UP"})
+        # Compute insurance returns from historical AUM + today's AUM
+        if f["display_name"] in insurance_hist and aum is not None:
+            today_aum = aum * 1e9  # convert back from Rp Miliar to raw
+            ins_perf = compute_insurance_returns(insurance_hist[f["display_name"]], today_aum)
+            perf.update(ins_perf)
         pt_rows.append({**f, **perf, "AUM": aum})
 
     pt_df = pd.DataFrame(pt_rows)
