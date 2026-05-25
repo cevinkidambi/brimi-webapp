@@ -125,7 +125,12 @@ def build_brimi_sheet(ref_brimi_df: pd.DataFrame, nav_df: pd.DataFrame, fund_map
                 if aum_col and pd.notna(fb_row[aum_col]):
                     aum_value = float(fb_row[aum_col])
 
+        date_value = ""
+        if nav_row is not None:
+            date_value = nav_row.get("Date", "")
+
         rows.append({
+            "Date": date_value,
             "Nama": brimi_name,
             "Jenis": "",
             "Manajer Investasi": "",
