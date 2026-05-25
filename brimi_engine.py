@@ -75,8 +75,24 @@ def fetch_api_data(token, output_dir):
     return d1_path, d2_path, indeks_path
 
 
+def fetch_unitlink(token):
+    """Fetch unitlink NAV data for Darlink funds from Investdata API."""
+    import requests
+    headers = {"Authorization": f"Bearer {token}"}
+    url = f"https://api.infovesta.com/api/unitlink/data/dailynavlatesttwodates"
+    print(f"Fetching unitlink data from {url}...")
+    r = requests.get(url, headers=headers, timeout=30)
+    r.raise_for_status()
+    data = r.json()
+    items = data if isinstance(data, list) else data.get("data", [])
+    # Filter for Darlink funds only
+    darlink = [x for x in items if "Darlink" in (x.get("productName") or "")]
+    print(f"  Unitlink records: {len(items)} total, {len(darlink)} Darlink")
+    return items
+
+
 def build_compiled(d1_file, d2_file, nav_d1_file, nav_d2_file,
-                   indeks_file, bb_file, output_path):
+                   indeks_file, bb_file, output_path, unitlink_data=None):
     """Build compiled Excel workbook from 6 raw source files.
 
     Adapted from raw_to_compiled.py's build_compiled(), using no reference Excel.
@@ -181,6 +197,20 @@ def build_compiled(d1_file, d2_file, nav_d1_file, nav_d2_file,
             src_cell = ws_bb_src.cell(row_idx, col_idx)
             ws_bb.cell(row_idx, col_idx).value = src_cell.value
 
+    # UNITLINK
+    if unitlink_data:
+        ws_ul = wb_out.create_sheet("UNITLINK")
+        ul_cols = ["productId", "productName", "singlePrice",
+                    "onedayreturn", "oneweekreturn", "mtdreturn",
+                    "onemonthreturn", "threemonthreturn", "sixmonthreturn",
+                    "ytdreturn", "oneyearreturn", "threeyearreturn"]
+        for ci, col in enumerate(ul_cols, 1):
+            ws_ul.cell(1, ci, col)
+        for ri, item in enumerate(unitlink_data, 2):
+            for ci, col in enumerate(ul_cols, 1):
+                ws_ul.cell(ri, ci, item.get(col))
+        print(f"UNITLINK: {len(unitlink_data)} funds")
+
     wb_out.save(output_path)
     wb_bb_src.close()
     print("Compiled workbook built successfully.")
@@ -212,11 +242,18 @@ def run_pipeline(historicalnav_t1_path, historicalnav_t2_path, bloomberg_path,
         api_dir = TMP_DIR
         d1_path, d2_path, indeks_path = fetch_api_data(token, api_dir)
 
+        # Step 1b: Fetch unitlink data (Darlink funds)
+        try:
+            unitlink_data = fetch_unitlink(token)
+        except Exception as e:
+            _log(f"Warning: unitlink fetch failed: {e}")
+            unitlink_data = None
+
         # Step 2: Build compiled workbook
         compiled_path = os.path.join(TMP_DIR, "compiled_input.xlsx")
         build_compiled(d1_path, d2_path, historicalnav_t1_path,
                        historicalnav_t2_path, indeks_path, bloomberg_path,
-                       compiled_path)
+                       compiled_path, unitlink_data=unitlink_data)
 
         # Step 3: Run process_brimi
         output_path = os.path.join(TMP_DIR, "brimi_output.xlsx")

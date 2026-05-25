@@ -26,6 +26,7 @@ from datetime import datetime
 
 warnings.filterwarnings("ignore")
 
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # ─────────────────────────────────────────────────────────────────────────────
 # CONSTANTS
@@ -288,6 +289,7 @@ def get_page_table_config(universe: dict) -> list[dict]:
                 "source":       source,
                 "is_index":     fund.get("is_index", False),
                 "aum_unit":     section.get("aum_unit", "Rp Miliar"),
+                "skip_rank":    section.get("skip_rank", False),
             })
     return entries
 
@@ -317,6 +319,102 @@ def load_bloomberg(wb_in) -> dict:
             h = cmap.get("H")
             entry["NAB/UP"] = r[h] if h is not None and h < len(r) else None
             out[name] = entry
+    return out
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# UNITLINK LOADER
+# ─────────────────────────────────────────────────────────────────────────────
+
+UL_PERF_MAP = {
+    "onedayreturn":     "1 Hr(%)",
+    "oneweekreturn":    "1 Mgg(%)",
+    "mtdreturn":        "MTD(%)",
+    "onemonthreturn":   "1 Bln(%)",
+    "threemonthreturn": "3 Bln(%)",
+    "sixmonthreturn":   "6 Bln(%)",
+    "ytdreturn":        "YTD(%)",
+    "oneyearreturn":    "1 Thn(%)",
+    "threeyearreturn":  "3 Thn(%)",
+}
+
+
+def load_unitlink(wb_in) -> dict:
+    """Load unitlink performance data from compiled workbook.
+    Returns {productName: {"NAB/UP": price, "1 Hr(%)": val, ...}}.
+    API % values are divided by 100 for decimal format.
+    """
+    if "UNITLINK" not in wb_in.sheetnames:
+        return {}
+    ws = wb_in["UNITLINK"]
+    rows = list(ws.iter_rows(values_only=True))
+    if not rows:
+        return {}
+    hdr = [str(c).strip() for c in rows[0]]
+    out = {}
+    for r in rows[1:]:
+        row = dict(zip(hdr, r))
+        name = row.get("productName")
+        if not name:
+            continue
+        entry = {"NAB/UP": row.get("singlePrice")}
+        for api_col, perf_col in UL_PERF_MAP.items():
+            val = row.get(api_col)
+            if val is not None:
+                entry[perf_col] = val / 100.0
+            else:
+                entry[perf_col] = None
+        out[name] = entry
+    return out
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# INSURANCE LOADER
+# ─────────────────────────────────────────────────────────────────────────────
+
+INS_BLOCKS = [
+    # (start_col_0indexed, display_name)
+    (0,  "PT ASURANSI BRI LIFE KPD BRIMI"),
+    (15, "PT BRI ASURANSI INDONESIA KPD BRI INSURANCE AFS"),
+    (32, "PT BRI ASURANSI INDONESIA KPD BRI INSURANCE HTM"),
+]
+
+INS_PERF_COLS = [
+    "1 Hr(%)", "1 Mgg(%)", "MTD(%)", "1 Bln(%)",
+    "3 Bln(%)", "6 Bln(%)", "YTD(%)", "1 Thn(%)",
+]
+
+
+def load_insurance(path: str) -> dict:
+    """Load latest rolling returns from insurance.xlsx for 3 insurance funds.
+    Returns {display_name: {"NAB/UP": None, "1 Hr(%)": val, ...}}.
+    """
+    if not os.path.exists(path):
+        print(f"  insurance.xlsx not found at {path}")
+        return {}
+    wb = openpyxl.load_workbook(path, data_only=True, read_only=True)
+    ws = wb["Sheet1"]
+    rows = list(ws.iter_rows(values_only=True))
+    wb.close()
+    if len(rows) < 3:
+        return {}
+
+    # Headers at row 1 (index 0), data starts at row 2 (index 1)
+    hdr = rows[0]
+    out = {}
+    for col_start, display_name in INS_BLOCKS:
+        # Latest data is at row index 1 (first data row after header)
+        r = rows[1]
+        entry = {"NAB/UP": None}
+        # Columns: Date(0), FundID(1), FundName(2), NAV(3), AUM(4), OutUnits(5),
+        #          1Hr(6), 1Mgg(7), MTD(8), 1Bln(9), 3Bln(10), 6Bln(11), YTD(12), 1Thn(13)
+        for i, perf_col in enumerate(INS_PERF_COLS):
+            ci = col_start + 6 + i
+            if ci < len(r):
+                entry[perf_col] = r[ci]
+            else:
+                entry[perf_col] = None
+        out[display_name] = entry
     return out
 
 
@@ -595,6 +693,12 @@ def process(input_path: str, output_path: str,
 
     wb_in          = openpyxl.load_workbook(input_path, data_only=True)
     bloomberg_data = load_bloomberg(wb_in)
+    unitlink_data  = load_unitlink(wb_in)
+    insurance_data = load_insurance(os.path.join(PROJECT_ROOT, "insurance.xlsx"))
+    if unitlink_data:
+        print(f"Unitlink funds     : {len(unitlink_data)}")
+    if insurance_data:
+        print(f"Insurance funds    : {len(insurance_data)}")
 
     pt_cfg  = get_page_table_config(universe)
     ppt_cfg = get_perf_table_config(universe)
@@ -609,6 +713,14 @@ def process(input_path: str, output_path: str,
         aum  = None if f["is_index"] else get_aum(
             f["display_name"], f.get("alias"), f["is_usd"],
             brimi_d1_lkp, brimi_d2_lkp, d1_lkp, d2_lkp)
+        # Override perf with unitlink data for Darlink funds
+        if f["display_name"] in unitlink_data:
+            ul = unitlink_data[f["display_name"]]
+            perf.update({k: v for k, v in ul.items() if k != "NAB/UP"})
+        # Override perf with insurance data for insurance funds
+        if f["display_name"] in insurance_data:
+            ins = insurance_data[f["display_name"]]
+            perf.update({k: v for k, v in ins.items() if k != "NAB/UP"})
         pt_rows.append({**f, **perf, "AUM": aum})
 
     pt_df = pd.DataFrame(pt_rows)
@@ -856,7 +968,6 @@ PT_HEADERS   = ["Nama", "NAB/UP", "1 Hr (%)", "1 Mgg (%)", "MTD (%)",
 
 def write_page_table(wb, df, nav_date_str: str | None = None):
     ws = wb.create_sheet("NEW PAGE TABLE (output)")
-    NCOLS = 13  # A..M
     row = 1
 
     # ── Row 1: empty
@@ -865,7 +976,7 @@ def write_page_table(wb, df, nav_date_str: str | None = None):
     # ── Row 2: *NAV as of …  (use date from source data)
     nav_label = f"*NAV as of {nav_date_str}" if nav_date_str else "*NAV as of (date unavailable)"
     ws.cell(row, 1, nav_label)
-    _fill_row(ws, row, FILL_NAV_DATE, FONT_NAV_DATE, ncols=NCOLS)
+    _fill_row(ws, row, FILL_NAV_DATE, FONT_NAV_DATE, ncols=13)
     row += 1
 
     # ── Rows 3-4: empty spacer
@@ -875,12 +986,15 @@ def write_page_table(wb, df, nav_date_str: str | None = None):
     for sidx, grp in df.groupby("section_idx", sort=False):
         section = grp.iloc[0]["section"]
         top = top_group(section)
+        skip_rank = bool(grp.iloc[0].get("skip_rank", False))
+        ncols = 12 if skip_rank else 13
+        headers = PT_HEADERS[:-1] if skip_rank else PT_HEADERS  # omit "Rank 1Y"
 
         # ── Top group header (e.g., "Equity Fund") — only when group changes
         if top != prev_top:
             ws.cell(row, 1, top).font = FONT_TOP_GRP
             # Apply bold to all cols but only A gets size 16
-            for c in range(2, 1 + NCOLS):
+            for c in range(2, 1 + ncols):
                 ws.cell(row, c).font = Font(name=FONT_NAME, bold=True, size=11)
             row += 1
             prev_top = top
@@ -888,15 +1002,15 @@ def write_page_table(wb, df, nav_date_str: str | None = None):
         # ── Column header row
         is_usd = bool(grp.iloc[0]["is_usd"])
         aum_lbl = f"AUM dalam {'Juta USD' if is_usd else 'Rp Miliar'}"
-        for ci, h in enumerate(PT_HEADERS + [aum_lbl], 1):
+        for ci, h in enumerate(headers + [aum_lbl], 1):
             c = ws.cell(row, ci, h)
             c.alignment = Alignment(horizontal="center")
-        _fill_row(ws, row, FILL_COL_HDR, FONT_COL_HDR, ncols=NCOLS)
+        _fill_row(ws, row, FILL_COL_HDR, FONT_COL_HDR, ncols=ncols)
         row += 1
 
         # ── Section name row (e.g., "Equity Fund (Big Cap)")
         ws.cell(row, 1, section)
-        _fill_row(ws, row, FILL_SECTION, FONT_SECTION, ncols=NCOLS)
+        _fill_row(ws, row, FILL_SECTION, FONT_SECTION, ncols=ncols)
         row += 1
 
         # ── Fund data rows — sorted: non-index by rank ASC, then indexes
@@ -904,7 +1018,7 @@ def write_page_table(wb, df, nav_date_str: str | None = None):
         idx_rows = grp[grp["is_index"]].copy()
 
         # Sort non-index funds by rank (ascending). Funds without rank go last.
-        if len(non_idx) > 0 and "Rank 1Y" in non_idx.columns:
+        if not skip_rank and len(non_idx) > 0 and "Rank 1Y" in non_idx.columns:
             non_idx = non_idx.copy()
             non_idx["_sort_rank"] = non_idx["Rank 1Y"].apply(
                 lambda x: x if x is not None and not (isinstance(x, float) and math.isnan(x)) else 9999
@@ -912,16 +1026,16 @@ def write_page_table(wb, df, nav_date_str: str | None = None):
             non_idx = non_idx.sort_values("_sort_rank", kind="mergesort")
 
         for _, f in non_idx.iterrows():
-            row = _write_fund_row(ws, row, f, NCOLS)
+            row = _write_fund_row(ws, row, f, ncols, skip_rank=skip_rank)
 
         # ── Spacer row before indexes (gray D0CECE, empty)
         if len(idx_rows) > 0:
-            _fill_row(ws, row, FILL_SPACER, FONT_FUND, ncols=NCOLS)
+            _fill_row(ws, row, FILL_SPACER, FONT_FUND, ncols=ncols)
             row += 1
 
         # ── Index rows (blue B4C6E7 background)
         for _, f in idx_rows.iterrows():
-            row = _write_index_row(ws, row, f, NCOLS)
+            row = _write_index_row(ws, row, f, ncols, skip_rank=skip_rank)
 
         # ── Empty row after section
         row += 1
@@ -937,15 +1051,22 @@ def write_page_table(wb, df, nav_date_str: str | None = None):
     ws.freeze_panes = "A5"
 
 
-def _write_fund_row(ws, row: int, f, ncols: int) -> int:
+def _write_fund_row(ws, row: int, f, ncols: int, skip_rank: bool = False) -> int:
     """Write a single fund data row. Returns next row number."""
     rank = f.get("Rank 1Y")
-    vals = (
-        [f["display_name"], _fmt(f.get("NAB/UP"))]
-        + [_fmt(f.get(c)) for c in PT_DATA_COLS]
-        + [int(rank) if rank is not None and not (isinstance(rank, float) and math.isnan(rank)) else None,
-           _fmt(f.get("AUM"))]
-    )
+    if skip_rank:
+        vals = (
+            [f["display_name"], _fmt(f.get("NAB/UP"))]
+            + [_fmt(f.get(c)) for c in PT_DATA_COLS]
+            + [_fmt(f.get("AUM"))]
+        )
+    else:
+        vals = (
+            [f["display_name"], _fmt(f.get("NAB/UP"))]
+            + [_fmt(f.get(c)) for c in PT_DATA_COLS]
+            + [int(rank) if rank is not None and not (isinstance(rank, float) and math.isnan(rank)) else None,
+               _fmt(f.get("AUM"))]
+        )
     for ci, v in enumerate(vals, 1):
         cell = ws.cell(row, ci, v)
         if ci > 1:
@@ -962,13 +1083,20 @@ def _write_fund_row(ws, row: int, f, ncols: int) -> int:
     return row + 1
 
 
-def _write_index_row(ws, row: int, f, ncols: int) -> int:
+def _write_index_row(ws, row: int, f, ncols: int, skip_rank: bool = False) -> int:
     """Write an index/benchmark row with blue B4C6E7 background."""
-    vals = (
-        [f["display_name"], _fmt(f.get("NAB/UP"))]
-        + [_fmt(f.get(c)) for c in PT_DATA_COLS]
-        + [None, None]  # No rank, no AUM for indexes
-    )
+    if skip_rank:
+        vals = (
+            [f["display_name"], _fmt(f.get("NAB/UP"))]
+            + [_fmt(f.get(c)) for c in PT_DATA_COLS]
+            + [None]  # No AUM for indexes
+        )
+    else:
+        vals = (
+            [f["display_name"], _fmt(f.get("NAB/UP"))]
+            + [_fmt(f.get(c)) for c in PT_DATA_COLS]
+            + [None, None]  # No rank, no AUM for indexes
+        )
     for ci, v in enumerate(vals, 1):
         cell = ws.cell(row, ci, v)
         if ci > 1:
