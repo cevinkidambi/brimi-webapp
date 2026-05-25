@@ -1005,14 +1005,19 @@ def write_page_table(wb, df, nav_date_str: str | None = None):
         _fill_row(ws, row, FILL_COL_HDR, FONT_COL_HDR, ncols=ncols)
         row += 1
 
-        # ── Section name row (e.g., "Equity Fund (Big Cap)")
-        ws.cell(row, 1, section)
+        # ── Section name row
+        # For Discretionary Fund: use benchmark name as section header
+        idx_rows = grp[grp["is_index"]].copy()
+        if skip_rank and len(idx_rows) > 0:
+            section_label = idx_rows.iloc[0]["display_name"]
+        else:
+            section_label = section
+        ws.cell(row, 1, section_label)
         _fill_row(ws, row, FILL_SECTION, FONT_SECTION, ncols=ncols)
         row += 1
 
         # ── Fund data rows — sorted: non-index by rank ASC, then indexes
         non_idx = grp[~grp["is_index"]].copy()
-        idx_rows = grp[grp["is_index"]].copy()
 
         # Sort non-index funds by rank (ascending). Funds without rank go last.
         if not skip_rank and len(non_idx) > 0 and "Rank 1Y" in non_idx.columns:
@@ -1025,14 +1030,14 @@ def write_page_table(wb, df, nav_date_str: str | None = None):
         for _, f in non_idx.iterrows():
             row = _write_fund_row(ws, row, f, ncols, skip_rank=skip_rank)
 
-        # ── Spacer row before indexes (gray D0CECE, empty)
-        if len(idx_rows) > 0:
+        # ── Index rows — only for non-discretionary sections
+        if not skip_rank and len(idx_rows) > 0:
+            # Spacer row before indexes (gray D0CECE, empty)
             _fill_row(ws, row, FILL_SPACER, FONT_FUND, ncols=ncols)
             row += 1
-
-        # ── Index rows (blue B4C6E7 background)
-        for _, f in idx_rows.iterrows():
-            row = _write_index_row(ws, row, f, ncols, skip_rank=skip_rank)
+            # Index rows (blue B4C6E7 background)
+            for _, f in idx_rows.iterrows():
+                row = _write_index_row(ws, row, f, ncols, skip_rank=skip_rank)
 
         # ── Empty row after section
         row += 1
