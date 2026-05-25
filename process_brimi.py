@@ -360,10 +360,7 @@ def load_unitlink(wb_in) -> dict:
         entry = {"NAB/UP": row.get("singlePrice")}
         for api_col, perf_col in UL_PERF_MAP.items():
             val = row.get(api_col)
-            if val is not None:
-                entry[perf_col] = val / 100.0
-            else:
-                entry[perf_col] = None
+            entry[perf_col] = val  # already in %
         out[name] = entry
     return out
 
@@ -716,7 +713,7 @@ def process(input_path: str, output_path: str,
         # Override perf with unitlink data for Darlink funds
         if f["display_name"] in unitlink_data:
             ul = unitlink_data[f["display_name"]]
-            perf.update({k: v for k, v in ul.items() if k != "NAB/UP"})
+            perf.update(ul)  # includes NAB/UP from singlePrice
         # Override perf with insurance data for insurance funds
         if f["display_name"] in insurance_data:
             ins = insurance_data[f["display_name"]]
