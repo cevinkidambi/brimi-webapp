@@ -232,17 +232,17 @@ def build_indeks_sheet(indeks_data):
         rows.append({
             "Nama": item.get("productName") or item.get("productId", ""),
             "Nilai": item.get("price"),
-            # API returns percentage (e.g. -2.0086), original uses decimal (e.g. -0.020086)
-            "1 Hr": item.get("onedayreturn") / 100 if item.get("onedayreturn") is not None else None,
-            "1 Mgg": item.get("oneweekreturn") / 100 if item.get("oneweekreturn") is not None else None,
-            "MTD": item.get("mtdreturn") / 100 if item.get("mtdreturn") is not None else None,
-            "1 Bln": item.get("onemonthreturn") / 100 if item.get("onemonthreturn") is not None else None,
-            "3 Bln": item.get("threemonthreturn") / 100 if item.get("threemonthreturn") is not None else None,
-            "6 Bln": item.get("sixmonthreturn") / 100 if item.get("sixmonthreturn") is not None else None,
-            "YTD": item.get("ytdreturn") / 100 if item.get("ytdreturn") is not None else None,
-            "1 Thn": item.get("oneyearreturn") / 100 if item.get("oneyearreturn") is not None else None,
-            "3 Thn": item.get("threeyearreturn") / 100 if item.get("threeyearreturn") is not None else None,
-            "5 Thn": item.get("fiveyearreturn") / 100 if item.get("fiveyearreturn") is not None else None,
+            # API values are already in % format
+            "1 Hr": item.get("onedayreturn"),
+            "1 Mgg": item.get("oneweekreturn"),
+            "MTD": item.get("mtdreturn"),
+            "1 Bln": item.get("onemonthreturn"),
+            "3 Bln": item.get("threemonthreturn"),
+            "6 Bln": item.get("sixmonthreturn"),
+            "YTD": item.get("ytdreturn"),
+            "1 Thn": item.get("oneyearreturn"),
+            "3 Thn": item.get("threeyearreturn"),
+            "5 Thn": item.get("fiveyearreturn"),
         })
     return pd.DataFrame(rows)
 
