@@ -43,6 +43,20 @@
       "d1_name": null,
       "nav_name": "BRI Balanced Regular Income Fund Kelas A",
       "note": "Price Return variant not in API. nav_name maps to base fund for NAV lookup. perf lookup uses base fund via strip_tr."
+    },
+    {
+      "display_name": "Darlink Aman",
+      "brimi_name": "KPD Pasar Uang Darlink Aman PT Asuransi BRI Life",
+      "d1_name": null,
+      "nav_name": null,
+      "note": "Discretionary fund. brimi_name maps to exact HistoricalNAV name for AUM."
+    },
+    {
+      "display_name": "Darlink Stabil",
+      "brimi_name": "PT ASURANSI BRI LIFE DARLINK STABIL",
+      "d1_name": null,
+      "nav_name": null,
+      "note": "Discretionary fund. brimi_name maps to exact HistoricalNAV name for AUM."
     }
   ],
 

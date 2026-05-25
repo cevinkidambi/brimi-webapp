@@ -1624,6 +1624,78 @@
             "active": true
           }
         ]
+      },
+      {
+        "section": "Discretionary Fund",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "skip_rank": true,
+        "funds": [
+          {
+            "display_name": "Infovesta Money Market Fund Index",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          },
+          {
+            "display_name": "Darlink Aman",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Discretionary Fund",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "skip_rank": true,
+        "funds": [
+          {
+            "display_name": "INDOBex Government Total Return*",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          },
+          {
+            "display_name": "Darlink Stabil",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          }
+        ]
+      },
+      {
+        "section": "Discretionary Fund",
+        "is_usd": false,
+        "aum_unit": "Rp Miliar",
+        "skip_rank": true,
+        "funds": [
+          {
+            "display_name": "LQ45",
+            "alias": null,
+            "is_index": true,
+            "active": true
+          },
+          {
+            "display_name": "PT ASURANSI BRI LIFE KPD BRIMI",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "PT BRI ASURANSI INDONESIA KPD BRI INSURANCE AFS",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "PT BRI ASURANSI INDONESIA KPD BRI INSURANCE HTM",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          }
+        ]
       }
     ]
   },
