@@ -410,14 +410,26 @@ def load_insurance_history(path: str) -> dict:
     return out
 
 
-def compute_insurance_returns(history: list, today_aum: float) -> dict:
+def compute_insurance_returns(history: list, today_aum: float,
+                              upload_date: datetime) -> dict:
     """Compute rolling returns from historical AUM series + today's AUM.
     history: [(date, aum), ...] sorted by date descending
     today_aum: AUM from today's BRIMI upload
+    upload_date: date of the BRIMI upload data
     Returns {"1 Hr(%)": val, ...} in % format.
     """
-    # Build full series: today + historical
-    series = [(datetime.today(), today_aum)] + history
+    # Check if upload_date already exists in history
+    # If yes, replace AUM (in case updated); if no, add new data point
+    series = []
+    date_exists = False
+    for d, aum in history:
+        if isinstance(d, datetime) and d.date() == upload_date.date():
+            series.append((d, today_aum))  # replace with new AUM
+            date_exists = True
+        else:
+            series.append((d, aum))
+    if not date_exists:
+        series.insert(0, (upload_date, today_aum))  # add new data point
 
     def _pct_return(days_back):
         if len(series) <= days_back:
@@ -429,8 +441,7 @@ def compute_insurance_returns(history: list, today_aum: float) -> dict:
         return None
 
     def _mtd_return():
-        today = datetime.today()
-        start_of_month = today.replace(day=1)
+        start_of_month = upload_date.replace(day=1)
         for i, (d, aum) in enumerate(series):
             if isinstance(d, datetime) and d < start_of_month:
                 if aum and aum != 0:
@@ -439,8 +450,7 @@ def compute_insurance_returns(history: list, today_aum: float) -> dict:
         return None
 
     def _ytd_return():
-        today = datetime.today()
-        start_of_year = today.replace(month=1, day=1)
+        start_of_year = upload_date.replace(month=1, day=1)
         for i, (d, aum) in enumerate(series):
             if isinstance(d, datetime) and d < start_of_year:
                 if aum and aum != 0:
@@ -718,6 +728,14 @@ def process(input_path: str, output_path: str,
     indeks   = pd.read_excel(xl, "INDEKS",    header=1)
     indeks   = indeks.rename(columns={indeks.columns[0]: "Nama", indeks.columns[1]: "Nilai"})
 
+    # Extract BRIMI upload date from D-2 (insurance funds are only in D-2)
+    brimi_upload_date = None
+    if len(brimi_d2) > 0 and "Date" in brimi_d2.columns:
+        brimi_upload_date = brimi_d2.iloc[0]["Date"]
+        if isinstance(brimi_upload_date, str):
+            brimi_upload_date = datetime.strptime(brimi_upload_date, "%Y-%m-%d")
+        print(f"BRIMI upload date  : {brimi_upload_date}")
+
     # Dynamic AUM column detection (name contains "AUM" and a date)
     aum_col = next((c for c in d1.columns if "AUM" in str(c) and "MI" not in str(c)
                     and "Shared" not in str(c)), None)
@@ -760,9 +778,9 @@ def process(input_path: str, output_path: str,
             ul = unitlink_data[f["display_name"]]
             perf.update(ul)  # includes NAB/UP from singlePrice
         # Compute insurance returns from historical AUM + today's AUM
-        if f["display_name"] in insurance_hist and aum is not None:
+        if f["display_name"] in insurance_hist and aum is not None and brimi_upload_date:
             today_aum = aum * 1e9  # convert back from Rp Miliar to raw
-            ins_perf = compute_insurance_returns(insurance_hist[f["display_name"]], today_aum)
+            ins_perf = compute_insurance_returns(insurance_hist[f["display_name"]], today_aum, brimi_upload_date)
             perf.update(ins_perf)
         pt_rows.append({**f, **perf, "AUM": aum})
 
