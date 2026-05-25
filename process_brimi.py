@@ -511,14 +511,14 @@ def get_aum(name: str, brimi_alias: str | None, is_usd: bool,
             if v is not None and float(v) != 0:
                 return float(v) / divisor
 
-    # 2. Cross-check BRIMI D-1 for USD funds
-    if is_usd:
-        for nm in _uniq(brimi_name, name):
-            row = lookup(nm, brimi_d1_lkp)
-            if row is not None:
-                v = safe(row, "AUM")
-                if v is not None and float(v) != 0:
-                    return float(v) / 1e9
+    # 2. Cross-check the other BRIMI sheet
+    other_lkp = brimi_d1_lkp if is_usd else brimi_d2_lkp
+    for nm in _uniq(brimi_name, name):
+        row = lookup(nm, other_lkp)
+        if row is not None:
+            v = safe(row, "AUM")
+            if v is not None and float(v) != 0:
+                return float(v) / divisor
 
     # 3. Fallback D-1/D-2
     lkp = d2_lkp if is_usd else d1_lkp
