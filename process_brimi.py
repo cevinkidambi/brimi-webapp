@@ -314,7 +314,7 @@ def load_bloomberg(wb_in) -> dict:
     for name, ridx in BLOOMBERG_ROW.items():
         if ridx < len(rows):
             r = rows[ridx]
-            entry = {col: r[cmap[letter]] if cmap.get(letter) is not None else None
+            entry = {col: (r[cmap[letter]] * 100 if r[cmap[letter]] is not None else None)
                            for letter, col in BB_COL.items()}
             h = cmap.get("H")
             entry["NAB/UP"] = r[h] if h is not None and h < len(r) else None
