@@ -1258,7 +1258,7 @@
             "active": true
           },
           {
-            "display_name": "BRI Syariah Berimbang",
+            "display_name": "BRI Syariah Berimbang - Total Return*",
             "alias": "BRI Syariah Berimbang - Total Return*",
             "is_index": false,
             "active": true
@@ -1277,7 +1277,7 @@
         "aum_unit": "Rp Miliar",
         "funds": [
           {
-            "display_name": "BRI Melati Pendapatan Utama",
+            "display_name": "BRI Melati Pendapatan Utama - Total Return*",
             "alias": "BRI Melati Pendapatan Utama - Total Return*",
             "is_index": false,
             "active": true

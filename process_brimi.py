@@ -521,18 +521,22 @@ def get_perf(name: str, alias: str | None, source: str,
     primary   = d2_lkp if source == "d2" else d1_lkp
     secondary = d1_lkp if source == "d2" else d2_lkp
 
-    fn = lookup_notr if is_price_return else lookup
-    nav_row = fn(nav_name, primary)
+    # Detect TR variants: use base NAV for TR funds, TR data for non-TR funds
+    is_tr = bool(re.search(r"total return\*?$", name, re.IGNORECASE))
+    nav_fn = lookup_notr if (is_tr or is_price_return) else lookup
+    perf_fn = lookup  # always use TR-promoted data for perf
+
+    nav_row = nav_fn(nav_name, primary)
     if nav_row is None:
-        nav_row = fn(nav_name, secondary)
+        nav_row = nav_fn(nav_name, secondary)
     if nav_row is not None:
         result["NAB/UP"] = safe(nav_row, D1_COL["NAB/UP"])
 
     # --- Performance: use alias rule ---
     perf_name = _resolve_perf_name(name, alias)
-    perf_row = fn(perf_name, primary)
+    perf_row = perf_fn(perf_name, primary)
     if perf_row is None:
-        perf_row = fn(perf_name, secondary)
+        perf_row = perf_fn(perf_name, secondary)
     if perf_row is not None:
         for col in PERF_COLS:
             result[col] = safe(perf_row, D1_COL.get(col))
