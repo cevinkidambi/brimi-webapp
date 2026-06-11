@@ -173,6 +173,23 @@ def lookup(name: str, lkp: dict):
     return lkp.get(norm(strip_tr(name)))
 
 
+def lookup_exact(name: str, lkp: dict):
+    """Try exact match only, no fallback to strip_tr.
+
+    Used for TR variants to ensure we find the exact TR data, not base data.
+    Returns None if exact name not found, allowing fallback to secondary source.
+    """
+    k = norm(name)
+    if k in lkp:
+        # Exact match — could be base key (TR-promoted) or a TR key itself.
+        # Prefer _base: to get the original base row.
+        base_row = lkp.get(f"_base:{k}")
+        if base_row is not None:
+            return base_row
+        return lkp[k]
+    return None
+
+
 def lookup_notr(name: str, lkp: dict):
     """Explicitly return the non-TR (base) row, ignoring TR-promoted entries."""
     for candidate in (norm(name), norm(strip_tr(name))):
@@ -524,7 +541,9 @@ def get_perf(name: str, alias: str | None, source: str,
     # Detect TR variants: use base NAV for TR funds, TR data for non-TR funds
     is_tr = bool(re.search(r"total return\*?$", name, re.IGNORECASE))
     nav_fn = lookup_notr if (is_tr or is_price_return) else lookup
-    perf_fn = lookup  # always use TR-promoted data for perf
+    # For TR variants, use lookup_exact to prevent fallback to base data.
+    # This allows proper fallback to secondary source (D-2) where TR data may exist.
+    perf_fn = lookup_exact if is_tr else lookup
 
     nav_row = nav_fn(nav_name, primary)
     if nav_row is None:
