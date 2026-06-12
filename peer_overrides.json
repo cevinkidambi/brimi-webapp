@@ -1,0 +1,64 @@
+{
+  "20": [
+    {
+      "active": true,
+      "alias": "BRI Melati Pendapatan Utama - Total Return*",
+      "display_name": "BRI Melati Pendapatan Utama - Total Return*",
+      "is_index": false
+    },
+    {
+      "active": true,
+      "alias": "Ashmore Dana Obligasi Nusantara Kelas A - Total Return*",
+      "display_name": "Ashmore Dana Obligasi Nusantara Kelas A - Total Return*",
+      "is_index": false
+    },
+    {
+      "active": true,
+      "alias": null,
+      "display_name": "BNP Paribas Prima II Kelas RK1",
+      "is_index": false
+    },
+    {
+      "active": true,
+      "alias": null,
+      "display_name": "Bahana Pendapatan Tetap Makara Prima Kelas G",
+      "is_index": false
+    },
+    {
+      "active": true,
+      "alias": null,
+      "display_name": "Trimegah Fixed Income Plan - Total Return*",
+      "is_index": false
+    },
+    {
+      "active": true,
+      "alias": null,
+      "display_name": "Mandiri Investa Dana Obligasi Seri II Kelas A",
+      "is_index": false
+    },
+    {
+      "active": true,
+      "alias": "Bahana Obligasi Ganesha Kelas D - Total Return*",
+      "display_name": "Bahana Obligasi Ganesha Kelas D - Total Return*",
+      "is_index": false
+    },
+    {
+      "active": true,
+      "alias": null,
+      "display_name": "Schroder Dana Mantap Plus II",
+      "is_index": false
+    },
+    {
+      "display_name": "Mandiri Investa Dana Utama Kelas A",
+      "alias": null,
+      "is_index": false,
+      "active": true
+    },
+    {
+      "active": true,
+      "alias": null,
+      "display_name": "Infovesta Government Bond Index",
+      "is_index": true
+    }
+  ]
+}
