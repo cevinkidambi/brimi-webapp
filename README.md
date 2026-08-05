@@ -42,45 +42,80 @@ User uploads 3 Excel files → Flask app → Compiled workbook → Output Excel
 
 | File | Purpose |
 |---|---|
-| `fund_universe.json` | Defines page_table sections (26 sections, 19 unique names) and performance_table funds (28 BRI-managed funds) |
-| `fund_map.json` | Name mapping overrides for cross-source fund matching (5 entries) |
-| `quartile_group_mapping.json` | Reference groups for quartile ranking |
+| `fund_universe.json` | Defines page_table sections (26 sections, incl. 3 duration-based fixed income) and performance_table funds (28 BRI-managed funds) |
+| `fund_map.json` | Name mapping overrides for cross-source fund matching |
+| `quartile_group_mapping.json` | Reference groups for quartile ranking (26 groups) |
+| `insurance.xlsx` | Historical AUM series for insurance-fund rolling returns (tracked in git) |
 | `vercel.json` | Vercel deployment config (`@vercel/python` builder, fluid compute) |
 
 ### Peer Override System
 
 Admin page (`/admin`) allows editing peer lists without touching code:
 - Edits saved to `peer_overrides.json` via GitHub API (commits to git)
-- Format: `{"0": [funds], "5": [funds]}` — dict keyed by section index
-- `process_brimi.py` reads and applies overrides at line 223
-- Only changed sections are stored; auto-deletes if all match base
+- Format: `{"0": [funds], "5": [funds]}` — dict keyed by section **index**, not name (handles duplicate section names)
+- `process_brimi._apply_peer_overrides()` reads and applies overrides at runtime (~line 269)
+- Only changed sections are stored; auto-deletes the file if all sections match base
+- New funds added via admin only work if they exist in the API D-1/D-2 data; otherwise they show empty performance
+
+> **Note on deploy flow**: `peer_overrides.json` is gitignored locally, so a local `vercel` CLI deploy carries no overrides file — the committed GitHub copy is what a git-integration deploy uses. When regrouping sections, all funds are baked into `fund_universe.json` and the stale overrides file deleted to avoid index-mismatch clobbering.
 
 ## Local Development
 
 ```bash
 pip install -r requirements.txt
-python api/index.py          # Flask dev server on :5000
-python process_brimi.py compiled.xlsx  # Direct processing
-python fetch_investdata.py   # Fetch latest API data to very_raw_data/
+cp investdata_api/.env.example investdata_api/.env   # then fill real credentials
+python app.py           # Flask dev server on :5001 (uses templates/)
+# or, processing a pre-compiled workbook directly:
+python process_brimi.py compiled.xlsx  # CLI: <input> [output] [universe] [fund_map]
 ```
+
+Local runs write to `./tmp/`. The Vercel entrypoint `api/index.py` differs from local `app.py` (API
+entrypoint inlines all HTML; app.py renders `templates/index.html`).
 
 ## Deployment
 
 - **Platform**: Vercel Fluid Compute (Python 3.12)
 - **Production URL**: https://brimimiperi.vercel.app
 - **Admin**: https://brimimiperi.vercel.app/admin
+- **GitHub integration**: pushing to `main` auto-deploys production. Use local preview deploys to test before any prod push.
 
-See `.claude/WORKFLOW.md` for deployment rules and guidelines.
+### Deploy workflow (preview first, always)
+
+```bash
+vercel --yes           # preview deploy (SSO-protected URL)
+# verify: main page 200, /admin/config returns sections
+vercel --prod --yes    # promote to production only after verifying
+```
+
+- `vercel.json` MUST have `"fluid": true` — without it the Python builder is skipped (build completes in ~100ms).
+- Use `/tmp` for working files, not `/var/task` (read-only on Vercel).
+- Preview deployments are protected by Vercel Authentication (SSO) — open them in a logged-in browser.
+- `vercel env add`: use `printf '%s' "value" | vercel env add <name> ...` — a `<<<` heredoc adds a trailing newline that breaks the value.
+
+See `.claude/WORKFLOW.md` and `HANDOVER.md` for operational details.
 
 ## Env Vars Required
 
-| Variable | Purpose |
+Set on **both** Production and Preview Vercel environments. Placeholders + the same set are in `.env.example`.
+
+| Variable | Purpose | Default/local |
+|---|---|---|
+| `INVESTDATA_USERNAME` | Infovesta API auth | from `investdata_api/.env` |
+| `INVESTDATA_PASSWORD` | Infovesta API auth | from `investdata_api/.env` |
+| `INVESTDATA_CLIENT_ID` | Infovesta API OAuth client | `api2` |
+| `INVESTDATA_CLIENT_SECRET` | Infovesta API OAuth secret | `api2` |
+| `GITHUB_TOKEN` | GitHub API (PAT with `repo` scope) for admin save | — |
+| `GITHUB_REPO_OWNER` | GitHub repo owner | `cevinkidambi` |
+| `GITHUB_REPO_NAME` | GitHub repo name | `brimi-webapp` |
+| `GITHUB_BRANCH` | Git branch to commit overrides | `main` |
+
+## Common Pitfalls
+
+| Symptom | Likely cause |
 |---|---|
-| `INVESTDATA_USERNAME` | Infovesta API auth |
-| `INVESTDATA_PASSWORD` | Infovesta API auth |
-| `INVESTDATA_CLIENT_ID` | Infovesta API OAuth client |
-| `INVESTDATA_CLIENT_SECRET` | Infovesta API OAuth secret |
-| `GITHUB_TOKEN` | GitHub API (PAT with `repo` scope) for admin save |
-| `GITHUB_REPO_OWNER` | GitHub repo owner (`cevinkidambi`) |
-| `GITHUB_REPO_NAME` | GitHub repo name (`brimi-webapp`) |
-| `GITHUB_BRANCH` | Git branch (`main`) |
+| Build completes in ~100ms | Missing `"fluid": true` in vercel.json |
+| 401 on all pages | Vercel SSO / Deployment Protection |
+| 404 after deploy | Python builder skipped, no output generated |
+| Admin save "Read-only file system" | Missing `GITHUB_TOKEN` env var (falls back to local file) |
+| Env var not working in deployed app | Trailing newline from `<<<` heredoc |
+| Duplicate sections get same overrides | Must match by index, not name (fixed) |
