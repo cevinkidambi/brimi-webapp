@@ -22,7 +22,7 @@ import pandas as pd
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment
 from openpyxl.utils import get_column_letter
-from datetime import datetime
+from datetime import datetime, timedelta
 
 warnings.filterwarnings("ignore")
 
@@ -32,36 +32,46 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 # CONSTANTS
 # ─────────────────────────────────────────────────────────────────────────────
 
-PERF_COLS = ["1 Hr(%)", "1 Mgg(%)", "MTD(%)", "1 Bln(%)", "3 Bln(%)",
-             "6 Bln(%)", "YTD(%)", "1 Thn(%)", "3 Thn(%)", "5 Thn(%)"]
+PERF_COLS = [
+    "1 Hr(%)",
+    "1 Mgg(%)",
+    "MTD(%)",
+    "1 Bln(%)",
+    "3 Bln(%)",
+    "6 Bln(%)",
+    "YTD(%)",
+    "1 Thn(%)",
+    "3 Thn(%)",
+    "5 Thn(%)",
+]
 
 D1_COL = {
-    "NAB/UP":   "NAB/UP",
-    "1 Hr(%)":  "1 Hr(%)",
+    "NAB/UP": "NAB/UP",
+    "1 Hr(%)": "1 Hr(%)",
     "1 Mgg(%)": "1 Mgg(%)",
-    "MTD(%)":   "MTD(%)",
+    "MTD(%)": "MTD(%)",
     "1 Bln(%)": "1 Bln(%)",
     "3 Bln(%)": "3 Bln(%)",
     "6 Bln(%)": "6 Bln(%)",
-    "YTD(%)":   "YTD(%)",
+    "YTD(%)": "YTD(%)",
     "1 Thn(%)": "1 Thn(%)",
     "3 Thn(%)": "3 Thn(%)",
     "5 Thn(%)": "5 Thn(%)",
-    "AUM":      None,   # detected dynamically from D-1 header
+    "AUM": None,  # detected dynamically from D-1 header
 }
 
 # Sections whose formulas reference D-2 instead of D-1
 D2_SECTION_KEYWORDS = ["global sharia equity"]
 
 INDEKS_COL = {
-    "NAB/UP":   "Nilai",
-    "1 Hr(%)":  "1 Hr",
+    "NAB/UP": "Nilai",
+    "1 Hr(%)": "1 Hr",
     "1 Mgg(%)": "1 Mgg",
-    "MTD(%)":   "MTD",
+    "MTD(%)": "MTD",
     "1 Bln(%)": "1 Bln",
     "3 Bln(%)": "3 Bln",
     "6 Bln(%)": "6 Bln",
-    "YTD(%)":   "YTD",
+    "YTD(%)": "YTD",
     "1 Thn(%)": "1 Thn",
     "3 Thn(%)": "3 Thn",
     "5 Thn(%)": None,
@@ -69,28 +79,45 @@ INDEKS_COL = {
 
 # Bloomberg sheet: fund name → 0-based row index
 BLOOMBERG_ROW = {
-    "MSCI World Islamic Index":            8,
-    "MSCI Indonesia ESG Screened":         7,
-    "INDOBex Government Total Return*":    9,
+    "MSCI World Islamic Index": 8,
+    "MSCI Indonesia ESG Screened": 7,
+    "INDOBex Government Total Return*": 9,
 }
 BB_COL = {
-    "I": "1 Hr(%)", "J": "1 Mgg(%)", "K": "MTD(%)",  "L": "1 Bln(%)",
-    "M": "3 Bln(%)", "N": "6 Bln(%)", "O": "YTD(%)", "P": "1 Thn(%)",
+    "I": "1 Hr(%)",
+    "J": "1 Mgg(%)",
+    "K": "MTD(%)",
+    "L": "1 Bln(%)",
+    "M": "3 Bln(%)",
+    "N": "6 Bln(%)",
+    "O": "YTD(%)",
+    "P": "1 Thn(%)",
     "Q": "3 Thn(%)",
 }
 
 INDEKS_NAMES = {
-    "LQ45", "IDX Small-Mid Cap Liquid", "Indeks Harga Saham Gabungan",
-    "Indeks Saham Syariah Indonesia", "Infovesta sharia Equity fund Index",
-    "Jakarta Islamic Index", "Infovesta Money Market Fund Index",
-    "Infovesta Balanced Fund Index", "Infovesta Government Bond Index",
-    "Infovesta Government Bond Index Short", "Infovesta Sharia Balanced Fund Index",
-    "Infovesta Sharia Money Market Fund", "Infovesta Fixed Income Fund Index",
-    "MSCI Indonesia ESG Screened", "Papan Akselerasi",
+    "LQ45",
+    "IDX Small-Mid Cap Liquid",
+    "Indeks Harga Saham Gabungan",
+    "Indeks Saham Syariah Indonesia",
+    "Infovesta sharia Equity fund Index",
+    "Jakarta Islamic Index",
+    "Infovesta Money Market Fund Index",
+    "Infovesta Balanced Fund Index",
+    "Infovesta Government Bond Index",
+    "Infovesta Government Bond Index Short",
+    "Infovesta Sharia Balanced Fund Index",
+    "Infovesta Sharia Money Market Fund",
+    "Infovesta Fixed Income Fund Index",
+    "MSCI Indonesia ESG Screened",
+    "Papan Akselerasi",
 }
 
-BLOOMBERG_NAMES = {"MSCI World Islamic Index", "MSCI Indonesia ESG Screened",
-                   "INDOBex Government Total Return*"}
+BLOOMBERG_NAMES = {
+    "MSCI World Islamic Index",
+    "MSCI Indonesia ESG Screened",
+    "INDOBex Government Total Return*",
+}
 
 QUARTILE_LABELS = {1: "Q1", 2: "Q2", 3: "Q3", 4: "Q4"}
 QUARTILE_COLORS = {"Q1": "70AD47", "Q2": "FFC000", "Q3": "ED7D31", "Q4": "FF0000"}
@@ -99,11 +126,22 @@ FUND_MAP: dict = {}
 
 # Scoring API score string → star text format
 SCORE_STARS = {
-    "0": "No Score", "1-": "* -", "1": "*", "1+": "* +",
-    "2-": "* * -", "2": "* *", "2+": "* * +",
-    "3-": "* * * -", "3": "* * *", "3+": "* * * +",
-    "4-": "* * * * -", "4": "* * * *", "4+": "* * * * +",
-    "5-": "* * * * * -", "5": "* * * * *", "5+": "* * * * * +",
+    "0": "No Score",
+    "1-": "* -",
+    "1": "*",
+    "1+": "* +",
+    "2-": "* * -",
+    "2": "* *",
+    "2+": "* * +",
+    "3-": "* * * -",
+    "3": "* * *",
+    "3+": "* * * +",
+    "4-": "* * * * -",
+    "4": "* * * *",
+    "4+": "* * * * +",
+    "5-": "* * * * * -",
+    "5": "* * * * *",
+    "5+": "* * * * * +",
     "notapplied": "No Score",
 }
 
@@ -112,18 +150,23 @@ SCORE_STARS = {
 # NORMALISATION
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def norm(s: str) -> str:
     return str(s).strip().lower()
 
+
 def strip_tr(name: str) -> str:
     """Strip '- Total Return' or '- Price Return' suffix and trailing asterisks."""
-    s = re.sub(r"\s*-\s*(?:total|price) return\*?\s*$", "", name, flags=re.IGNORECASE).strip()
+    s = re.sub(
+        r"\s*-\s*(?:total|price) return\*?\s*$", "", name, flags=re.IGNORECASE
+    ).strip()
     return re.sub(r"\*+\s*$", "", s).strip()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # LOOKUP HELPERS
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def build_lookup(df: pd.DataFrame, name_col: str = "Nama") -> dict:
     """
@@ -145,7 +188,9 @@ def build_lookup(df: pd.DataFrame, name_col: str = "Nama") -> dict:
     # under the base key "X" so lookup("X") returns TR data.
     # Save original base row under "_base:X" so lookup_notr can find it.
     for tk in tr_keys:
-        base_k = re.sub(r"\s*-\s*total return\*?\s*$", "", tk, flags=re.IGNORECASE).strip()
+        base_k = re.sub(
+            r"\s*-\s*total return\*?\s*$", "", tk, flags=re.IGNORECASE
+        ).strip()
         if base_k and base_k in lkp:
             lkp[f"_base:{base_k}"] = lkp[base_k]
             lkp[base_k] = lkp[tk]
@@ -173,6 +218,23 @@ def lookup(name: str, lkp: dict):
     return lkp.get(norm(strip_tr(name)))
 
 
+def lookup_exact(name: str, lkp: dict):
+    """Try exact match only, no fallback to strip_tr.
+
+    Used for TR variants to ensure we find the exact TR data, not base data.
+    Returns None if exact name not found, allowing fallback to secondary source.
+    """
+    k = norm(name)
+    if k in lkp:
+        # Exact match — could be base key (TR-promoted) or a TR key itself.
+        # Prefer _base: to get the original base row.
+        base_row = lkp.get(f"_base:{k}")
+        if base_row is not None:
+            return base_row
+        return lkp[k]
+    return None
+
+
 def lookup_notr(name: str, lkp: dict):
     """Explicitly return the non-TR (base) row, ignoring TR-promoted entries."""
     for candidate in (norm(name), norm(strip_tr(name))):
@@ -195,7 +257,12 @@ def safe(row, col):
         v = row[col]
         if v is None or (isinstance(v, float) and math.isnan(v)):
             return None
-        if isinstance(v, str) and v.strip().upper() in ("N/A", "#N/A", "#REF!", "#VALUE!"):
+        if isinstance(v, str) and v.strip().upper() in (
+            "N/A",
+            "#N/A",
+            "#REF!",
+            "#VALUE!",
+        ):
             return None
         return v
     except (KeyError, TypeError):
@@ -216,6 +283,7 @@ def _fmt(v):
 # CONFIG LOADERS
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def load_fund_map(path: str) -> dict:
     if not os.path.exists(path):
         return {}
@@ -224,8 +292,8 @@ def load_fund_map(path: str) -> dict:
     return {
         norm(e["display_name"]): {
             "brimi_name": e.get("brimi_name"),
-            "d1_name":    e.get("d1_name"),
-            "nav_name":   e.get("nav_name"),
+            "d1_name": e.get("d1_name"),
+            "nav_name": e.get("nav_name"),
         }
         for e in data.get("mappings", [])
     }
@@ -279,18 +347,20 @@ def get_page_table_config(universe: dict) -> list[dict]:
         for fund in section["funds"]:
             if not fund.get("active", True):
                 continue
-            entries.append({
-                "section":      section["section"],
-                "section_idx":  si,
-                "rank_group":   section.get("rank_group"),
-                "display_name": fund["display_name"],
-                "alias":        fund.get("alias"),
-                "is_usd":       section.get("is_usd", False),
-                "source":       source,
-                "is_index":     fund.get("is_index", False),
-                "aum_unit":     section.get("aum_unit", "Rp Miliar"),
-                "skip_rank":    section.get("skip_rank", False),
-            })
+            entries.append(
+                {
+                    "section": section["section"],
+                    "section_idx": si,
+                    "rank_group": section.get("rank_group"),
+                    "display_name": fund["display_name"],
+                    "alias": fund.get("alias"),
+                    "is_usd": section.get("is_usd", False),
+                    "source": source,
+                    "is_index": fund.get("is_index", False),
+                    "aum_unit": section.get("aum_unit", "Rp Miliar"),
+                    "skip_rank": section.get("skip_rank", False),
+                }
+            )
     return entries
 
 
@@ -303,19 +373,22 @@ def get_perf_table_config(universe: dict) -> list[dict]:
 # BLOOMBERG LOADER
 # ─────────────────────────────────────────────────────────────────────────────
 
+
 def load_bloomberg(wb_in) -> dict:
     out = {}
     if "BloombergIndex" not in wb_in.sheetnames:
         return out
-    ws   = wb_in["BloombergIndex"]
-    hdr  = list(ws.iter_rows(min_row=1, max_row=1, values_only=True))[0]
+    ws = wb_in["BloombergIndex"]
+    hdr = list(ws.iter_rows(min_row=1, max_row=1, values_only=True))[0]
     cmap = {get_column_letter(j + 1): j for j in range(len(hdr))}
     rows = list(ws.iter_rows(values_only=True))
     for name, ridx in BLOOMBERG_ROW.items():
         if ridx < len(rows):
             r = rows[ridx]
-            entry = {col: r[cmap[letter]] if cmap.get(letter) is not None else None
-                           for letter, col in BB_COL.items()}
+            entry = {
+                col: (r[cmap[letter]] * 100 if r[cmap[letter]] is not None else None)
+                for letter, col in BB_COL.items()
+            }
             h = cmap.get("H")
             entry["NAB/UP"] = r[h] if h is not None and h < len(r) else None
             out[name] = entry
@@ -327,15 +400,15 @@ def load_bloomberg(wb_in) -> dict:
 # ─────────────────────────────────────────────────────────────────────────────
 
 UL_PERF_MAP = {
-    "onedayreturn":     "1 Hr(%)",
-    "oneweekreturn":    "1 Mgg(%)",
-    "mtdreturn":        "MTD(%)",
-    "onemonthreturn":   "1 Bln(%)",
+    "onedayreturn": "1 Hr(%)",
+    "oneweekreturn": "1 Mgg(%)",
+    "mtdreturn": "MTD(%)",
+    "onemonthreturn": "1 Bln(%)",
     "threemonthreturn": "3 Bln(%)",
-    "sixmonthreturn":   "6 Bln(%)",
-    "ytdreturn":        "YTD(%)",
-    "oneyearreturn":    "1 Thn(%)",
-    "threeyearreturn":  "3 Thn(%)",
+    "sixmonthreturn": "6 Bln(%)",
+    "ytdreturn": "YTD(%)",
+    "oneyearreturn": "1 Thn(%)",
+    "threeyearreturn": "3 Thn(%)",
 }
 
 
@@ -371,14 +444,20 @@ def load_unitlink(wb_in) -> dict:
 
 INS_BLOCKS = [
     # (start_col_0indexed, display_name)
-    (0,  "PT ASURANSI BRI LIFE KPD BRIMI"),
+    (0, "PT ASURANSI BRI LIFE KPD BRIMI"),
     (15, "PT BRI ASURANSI INDONESIA KPD BRI INSURANCE AFS"),
     (30, "PT BRI ASURANSI INDONESIA KPD BRI INSURANCE HTM"),
 ]
 
 INS_PERF_COLS = [
-    "1 Hr(%)", "1 Mgg(%)", "MTD(%)", "1 Bln(%)",
-    "3 Bln(%)", "6 Bln(%)", "YTD(%)", "1 Thn(%)",
+    "1 Hr(%)",
+    "1 Mgg(%)",
+    "MTD(%)",
+    "1 Bln(%)",
+    "3 Bln(%)",
+    "6 Bln(%)",
+    "YTD(%)",
+    "1 Thn(%)",
 ]
 
 
@@ -410,8 +489,9 @@ def load_insurance_history(path: str) -> dict:
     return out
 
 
-def compute_insurance_returns(history: list, today_aum: float,
-                              upload_date: datetime) -> dict:
+def compute_insurance_returns(
+    history: list, today_aum: float, upload_date: datetime
+) -> dict:
     """Compute rolling returns from historical AUM series + today's AUM.
     history: [(date, aum), ...] sorted by date descending
     today_aum: AUM from today's BRIMI upload
@@ -441,38 +521,39 @@ def compute_insurance_returns(history: list, today_aum: float,
         return None
 
     def _mtd_return():
-        start_of_month = upload_date.replace(day=1)
+        end_of_prev_month = upload_date.replace(day=1) - timedelta(days=1)
         for i, (d, aum) in enumerate(series):
-            if isinstance(d, datetime) and d < start_of_month:
+            if isinstance(d, datetime) and d.date() <= end_of_prev_month.date():
                 if aum and aum != 0:
                     return (series[0][1] - aum) / aum * 100
                 return None
         return None
 
     def _ytd_return():
-        start_of_year = upload_date.replace(month=1, day=1)
+        end_of_prev_year = upload_date.replace(month=1, day=1) - timedelta(days=1)
         for i, (d, aum) in enumerate(series):
-            if isinstance(d, datetime) and d < start_of_year:
+            if isinstance(d, datetime) and d.date() <= end_of_prev_year.date():
                 if aum and aum != 0:
                     return (series[0][1] - aum) / aum * 100
                 return None
         return None
 
     return {
-        "1 Hr(%)":  _pct_return(1),
-        "1 Mgg(%)": _pct_return(7),
-        "MTD(%)":   _mtd_return(),
-        "1 Bln(%)": _pct_return(30),
-        "3 Bln(%)": _pct_return(90),
-        "6 Bln(%)": _pct_return(180),
-        "YTD(%)":   _ytd_return(),
-        "1 Thn(%)": _pct_return(365),
+        "1 Hr(%)": _pct_return(1),
+        "1 Mgg(%)": _pct_return(5),
+        "MTD(%)": _mtd_return(),
+        "1 Bln(%)": _pct_return(19),
+        "3 Bln(%)": _pct_return(56),
+        "6 Bln(%)": _pct_return(119),
+        "YTD(%)": _ytd_return(),
+        "1 Thn(%)": _pct_return(235),
     }
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # PERFORMANCE RESOLVER
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def _resolve_perf_name(display_name: str, alias: str | None) -> str:
     """Determine the lookup name for performance columns.
@@ -490,9 +571,16 @@ def _resolve_perf_name(display_name: str, alias: str | None) -> str:
     return alias
 
 
-def get_perf(name: str, alias: str | None, source: str,
-             d1_lkp: dict, d2_lkp: dict, indeks_lkp: dict,
-             bloomberg_data: dict, is_price_return: bool = False) -> dict:
+def get_perf(
+    name: str,
+    alias: str | None,
+    source: str,
+    d1_lkp: dict,
+    d2_lkp: dict,
+    indeks_lkp: dict,
+    bloomberg_data: dict,
+    is_price_return: bool = False,
+) -> dict:
     """Resolve NAV + performance columns for a fund.
 
     Args:
@@ -518,21 +606,27 @@ def get_perf(name: str, alias: str | None, source: str,
 
     # --- NAV: always use display_name (or nav_name override) ---
     nav_name = override.get("nav_name") or name
-    primary   = d2_lkp if source == "d2" else d1_lkp
+    primary = d2_lkp if source == "d2" else d1_lkp
     secondary = d1_lkp if source == "d2" else d2_lkp
 
-    fn = lookup_notr if is_price_return else lookup
-    nav_row = fn(nav_name, primary)
+    # Detect TR variants: use base NAV for TR funds, TR data for non-TR funds
+    is_tr = bool(re.search(r"total return\*?$", name, re.IGNORECASE))
+    nav_fn = lookup_notr if (is_tr or is_price_return) else lookup
+    # For TR variants, use lookup_exact to prevent fallback to base data.
+    # This allows proper fallback to secondary source (D-2) where TR data may exist.
+    perf_fn = lookup_exact if is_tr else lookup
+
+    nav_row = nav_fn(nav_name, primary)
     if nav_row is None:
-        nav_row = fn(nav_name, secondary)
+        nav_row = nav_fn(nav_name, secondary)
     if nav_row is not None:
         result["NAB/UP"] = safe(nav_row, D1_COL["NAB/UP"])
 
     # --- Performance: use alias rule ---
     perf_name = _resolve_perf_name(name, alias)
-    perf_row = fn(perf_name, primary)
+    perf_row = perf_fn(perf_name, primary)
     if perf_row is None:
-        perf_row = fn(perf_name, secondary)
+        perf_row = perf_fn(perf_name, secondary)
     if perf_row is not None:
         for col in PERF_COLS:
             result[col] = safe(perf_row, D1_COL.get(col))
@@ -544,18 +638,25 @@ def get_perf(name: str, alias: str | None, source: str,
 # AUM RESOLVER
 # ─────────────────────────────────────────────────────────────────────────────
 
-def get_aum(name: str, brimi_alias: str | None, is_usd: bool,
-            brimi_d1_lkp: dict, brimi_d2_lkp: dict,
-            d1_lkp: dict, d2_lkp: dict) -> float | None:
+
+def get_aum(
+    name: str,
+    brimi_alias: str | None,
+    is_usd: bool,
+    brimi_d1_lkp: dict,
+    brimi_d2_lkp: dict,
+    d1_lkp: dict,
+    d2_lkp: dict,
+) -> float | None:
     """
     Priority:
       1. BRIMI D-1 / D-2 — BRI's own daily AUM (primary)
       2. D-1 / D-2 AUM column — our data (fallback)
     """
-    override   = FUND_MAP.get(norm(name), {})
+    override = FUND_MAP.get(norm(name), {})
     brimi_name = override.get("brimi_name") or brimi_alias or name
-    d1_name    = override.get("d1_name")    or brimi_alias or name
-    divisor    = 1e6 if is_usd else 1e9
+    d1_name = override.get("d1_name") or brimi_alias or name
+    divisor = 1e6 if is_usd else 1e9
 
     # 1. BRIMI primary
     brimi_lkp = brimi_d2_lkp if is_usd else brimi_d1_lkp
@@ -591,13 +692,15 @@ def _uniq(*args) -> list:
     seen, out = set(), []
     for a in args:
         if a and a not in seen:
-            seen.add(a); out.append(a)
+            seen.add(a)
+            out.append(a)
     return out
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # RANKING & QUARTILE
 # ─────────────────────────────────────────────────────────────────────────────
+
 
 def rank_quartile(values: list) -> list[tuple]:
     """Rank values descending, assign quartile using Excel QUARTILE thresholds on ranks.
@@ -608,8 +711,11 @@ def rank_quartile(values: list) -> list[tuple]:
       3. Q = IF(rank < T1, 1, IF(rank < T2, 2, IF(rank < T3, 3, 4)))
     """
     n = len(values)
-    valid = [(i, float(v)) for i, v in enumerate(values)
-             if v is not None and not (isinstance(v, float) and math.isnan(v))]
+    valid = [
+        (i, float(v))
+        for i, v in enumerate(values)
+        if v is not None and not (isinstance(v, float) and math.isnan(v))
+    ]
     result = [(None, None)] * n
     if not valid:
         return result
@@ -627,6 +733,7 @@ def rank_quartile(values: list) -> list[tuple]:
 
     # Excel QUARTILE = PERCENTILE.INC: position = q * (n-1) / 4
     sorted_ranks = sorted(r for r in ranks if r is not None)
+
     def quartile(q):
         pos = q * (total - 1) / 4
         lo = int(math.floor(pos))
@@ -670,12 +777,17 @@ def _fetch_scoring_by_name():
     headers = {"Authorization": f"Bearer {token}"}
 
     # Fetch scoring data
-    r = requests.get("https://api.infovesta.com/api/mutualfund/data/scoring", headers=headers)
+    r = requests.get(
+        "https://api.infovesta.com/api/mutualfund/data/scoring", headers=headers
+    )
     r.raise_for_status()
     scoring_data = r.json()
 
     # Fetch daily NAV for name → productId mapping
-    r = requests.get("https://api.infovesta.com/api/mutualfund/data/dailynavlatesttwodates", headers=headers)
+    r = requests.get(
+        "https://api.infovesta.com/api/mutualfund/data/dailynavlatesttwodates",
+        headers=headers,
+    )
     r.raise_for_status()
     nav_data = r.json()
 
@@ -704,9 +816,13 @@ def _fetch_scoring_by_name():
 # MAIN
 # ─────────────────────────────────────────────────────────────────────────────
 
-def process(input_path: str, output_path: str,
-            universe_path: str = "fund_universe.json",
-            fund_map_path: str = "fund_map.json"):
+
+def process(
+    input_path: str,
+    output_path: str,
+    universe_path: str = "fund_universe.json",
+    fund_map_path: str = "fund_map.json",
+):
     global FUND_MAP
     FUND_MAP = load_fund_map(fund_map_path)
     universe = load_universe(universe_path)
@@ -717,16 +833,22 @@ def process(input_path: str, output_path: str,
     # Extract NAV date from D-1 header row
     _wb_tmp = openpyxl.load_workbook(input_path, data_only=True)
     _d1_header = str(_wb_tmp["D-1"].cell(1, 1).value or "")
-    nav_date_str = _d1_header.replace("Data Per Tanggal : ", "").strip() if "Tanggal" in _d1_header else None
+    nav_date_str = (
+        _d1_header.replace("Data Per Tanggal : ", "").strip()
+        if "Tanggal" in _d1_header
+        else None
+    )
     _wb_tmp.close()
 
     xl = pd.ExcelFile(input_path)
-    d1       = pd.read_excel(xl, "D-1",       header=1)
-    d2       = pd.read_excel(xl, "D-2",       header=1)
+    d1 = pd.read_excel(xl, "D-1", header=1)
+    d2 = pd.read_excel(xl, "D-2", header=1)
     brimi_d1 = pd.read_excel(xl, "BRIMI D-1", header=1)
     brimi_d2 = pd.read_excel(xl, "BRIMI D-2", header=1)
-    indeks   = pd.read_excel(xl, "INDEKS",    header=1)
-    indeks   = indeks.rename(columns={indeks.columns[0]: "Nama", indeks.columns[1]: "Nilai"})
+    indeks = pd.read_excel(xl, "INDEKS", header=1)
+    indeks = indeks.rename(
+        columns={indeks.columns[0]: "Nama", indeks.columns[1]: "Nilai"}
+    )
 
     # Extract BRIMI upload date from D-2 (insurance funds are only in D-2)
     brimi_upload_date = None
@@ -737,30 +859,38 @@ def process(input_path: str, output_path: str,
         print(f"BRIMI upload date  : {brimi_upload_date}")
 
     # Dynamic AUM column detection (name contains "AUM" and a date)
-    aum_col = next((c for c in d1.columns if "AUM" in str(c) and "MI" not in str(c)
-                    and "Shared" not in str(c)), None)
+    aum_col = next(
+        (
+            c
+            for c in d1.columns
+            if "AUM" in str(c) and "MI" not in str(c) and "Shared" not in str(c)
+        ),
+        None,
+    )
     if aum_col:
         D1_COL["AUM"] = aum_col
         print(f"AUM column         : {aum_col}")
     else:
         print("WARNING: AUM column not found in D-1")
 
-    d1_lkp       = build_lookup(d1)
-    d2_lkp       = build_lookup(d2)
+    d1_lkp = build_lookup(d1)
+    d2_lkp = build_lookup(d2)
     brimi_d1_lkp = build_lookup(brimi_d1)
     brimi_d2_lkp = build_lookup(brimi_d2)
-    indeks_lkp   = build_lookup(indeks)
+    indeks_lkp = build_lookup(indeks)
 
-    wb_in          = openpyxl.load_workbook(input_path, data_only=True)
+    wb_in = openpyxl.load_workbook(input_path, data_only=True)
     bloomberg_data = load_bloomberg(wb_in)
-    unitlink_data  = load_unitlink(wb_in)
-    insurance_hist = load_insurance_history(os.path.join(PROJECT_ROOT, "insurance.xlsx"))
+    unitlink_data = load_unitlink(wb_in)
+    insurance_hist = load_insurance_history(
+        os.path.join(PROJECT_ROOT, "insurance.xlsx")
+    )
     if unitlink_data:
         print(f"Unitlink funds     : {len(unitlink_data)}")
     if insurance_hist:
         print(f"Insurance funds    : {len(insurance_hist)} (historical data)")
 
-    pt_cfg  = get_page_table_config(universe)
+    pt_cfg = get_page_table_config(universe)
     ppt_cfg = get_perf_table_config(universe)
     print(f"Page table         : {len(pt_cfg)} entries")
     print(f"Performance table  : {len(ppt_cfg)} entries")
@@ -768,19 +898,42 @@ def process(input_path: str, output_path: str,
     # ── Page Table ────────────────────────────────────────────────────────
     pt_rows = []
     for f in pt_cfg:
-        perf = get_perf(f["display_name"], f.get("alias"), f.get("source", "d1"),
-                        d1_lkp, d2_lkp, indeks_lkp, bloomberg_data)
-        aum  = None if f["is_index"] else get_aum(
-            f["display_name"], f.get("alias"), f["is_usd"],
-            brimi_d1_lkp, brimi_d2_lkp, d1_lkp, d2_lkp)
+        perf = get_perf(
+            f["display_name"],
+            f.get("alias"),
+            f.get("source", "d1"),
+            d1_lkp,
+            d2_lkp,
+            indeks_lkp,
+            bloomberg_data,
+        )
+        aum = (
+            None
+            if f["is_index"]
+            else get_aum(
+                f["display_name"],
+                f.get("alias"),
+                f["is_usd"],
+                brimi_d1_lkp,
+                brimi_d2_lkp,
+                d1_lkp,
+                d2_lkp,
+            )
+        )
         # Override perf with unitlink data for Darlink funds
         if f["display_name"] in unitlink_data:
             ul = unitlink_data[f["display_name"]]
             perf.update(ul)  # includes NAB/UP from singlePrice
         # Compute insurance returns from historical AUM + today's AUM
-        if f["display_name"] in insurance_hist and aum is not None and brimi_upload_date:
+        if (
+            f["display_name"] in insurance_hist
+            and aum is not None
+            and brimi_upload_date
+        ):
             today_aum = aum * 1e9  # convert back from Rp Miliar to raw
-            ins_perf = compute_insurance_returns(insurance_hist[f["display_name"]], today_aum, brimi_upload_date)
+            ins_perf = compute_insurance_returns(
+                insurance_hist[f["display_name"]], today_aum, brimi_upload_date
+            )
             perf.update(ins_perf)
         pt_rows.append({**f, **perf, "AUM": aum})
 
@@ -794,7 +947,9 @@ def process(input_path: str, output_path: str,
     # 1) Cross-section groups: combine all funds with the same rank_group
     grouped_names = set()
     if "rank_group" in non_idx.columns:
-        for rg, grp in non_idx[non_idx["rank_group"].notna()].groupby("rank_group", sort=False):
+        for rg, grp in non_idx[non_idx["rank_group"].notna()].groupby(
+            "rank_group", sort=False
+        ):
             # De-duplicate by display_name (take first occurrence's value)
             seen = {}
             for idx, row in grp.iterrows():
@@ -822,12 +977,29 @@ def process(input_path: str, output_path: str,
     # ── Performance Table ─────────────────────────────────────────────────
     ppt_rows = []
     for f in ppt_cfg:
-        perf = get_perf(f["display_name"], None, "d1",
-                        d1_lkp, d2_lkp, indeks_lkp, bloomberg_data,
-                        is_price_return=f.get("is_price_return", False))
-        aum  = None if f.get("is_benchmark") else get_aum(
-            f["display_name"], f.get("brimi_alias"), f.get("is_usd", False),
-            brimi_d1_lkp, brimi_d2_lkp, d1_lkp, d2_lkp)
+        perf = get_perf(
+            f["display_name"],
+            None,
+            "d1",
+            d1_lkp,
+            d2_lkp,
+            indeks_lkp,
+            bloomberg_data,
+            is_price_return=f.get("is_price_return", False),
+        )
+        aum = (
+            None
+            if f.get("is_benchmark")
+            else get_aum(
+                f["display_name"],
+                f.get("brimi_alias"),
+                f.get("is_usd", False),
+                brimi_d1_lkp,
+                brimi_d2_lkp,
+                d1_lkp,
+                d2_lkp,
+            )
+        )
         ppt_rows.append({**f, **perf, "AUM": aum})
 
     ppt_df = pd.DataFrame(ppt_rows)
@@ -844,7 +1016,9 @@ def process(input_path: str, output_path: str,
     # The reference "NEW VS MI2" sheet defines 26 fund groups. Quartile
     # thresholds depend on ranking ALL funds in each group, not just our 28.
     # Build a lookup: norm(name) -> {rank, quartile} per period.
-    REF_GROUPS_FILE = os.path.join(os.path.dirname(__file__), "quartile_group_mapping.json")
+    REF_GROUPS_FILE = os.path.join(
+        os.path.dirname(__file__), "quartile_group_mapping.json"
+    )
     if os.path.exists(REF_GROUPS_FILE):
         with open(REF_GROUPS_FILE) as f:
             _gm = json.load(f)
@@ -896,7 +1070,12 @@ def process(input_path: str, output_path: str,
         # already have its own entry (both may be in the same group).
         for tr_name, entry in list(_quartile_lookup.items()):
             non_tr = tr_name.replace(" - total return*", "").strip()
-            if non_tr and non_tr != tr_name and (non_tr in _d1_by_name or non_tr in _d2_by_name) and non_tr not in _quartile_lookup:
+            if (
+                non_tr
+                and non_tr != tr_name
+                and (non_tr in _d1_by_name or non_tr in _d2_by_name)
+                and non_tr not in _quartile_lookup
+            ):
                 _quartile_lookup[non_tr] = entry
     else:
         _quartile_lookup = {}
@@ -981,29 +1160,33 @@ def process(input_path: str, output_path: str,
 FONT_NAME = "Nirmala Text"
 FONT_DEFAULT = Font(name=FONT_NAME, size=11, color="000000")
 FILL_NAV_DATE = PatternFill("solid", fgColor="E7E6E6")
-FILL_COL_HDR  = PatternFill("solid", fgColor="1F4E78")
-FILL_SECTION  = PatternFill("solid", fgColor="BDD7EE")
-FILL_INDEX    = PatternFill("solid", fgColor="B4C6E7")
-FILL_SPACER   = PatternFill("solid", fgColor="D0CECE")
+FILL_COL_HDR = PatternFill("solid", fgColor="1F4E78")
+FILL_SECTION = PatternFill("solid", fgColor="BDD7EE")
+FILL_INDEX = PatternFill("solid", fgColor="B4C6E7")
+FILL_SPACER = PatternFill("solid", fgColor="D0CECE")
 
 FONT_NAV_DATE = Font(name=FONT_NAME, bold=True, size=10, color="000000")
-FONT_TOP_GRP  = Font(name=FONT_NAME, bold=True, size=16, color="000000")
-FONT_COL_HDR  = Font(name=FONT_NAME, bold=True, size=11, color="F2F2F2")
-FONT_SECTION  = Font(name=FONT_NAME, size=11)  # not bold, no explicit color
-FONT_BRI      = Font(name=FONT_NAME, bold=True, size=11, color="000000")
-FONT_FUND     = Font(name=FONT_NAME, size=11, color="000000")
-FONT_INDEX    = Font(name=FONT_NAME, bold=True, size=11, color="000000")
+FONT_TOP_GRP = Font(name=FONT_NAME, bold=True, size=16, color="000000")
+FONT_COL_HDR = Font(name=FONT_NAME, bold=True, size=11, color="F2F2F2")
+FONT_SECTION = Font(name=FONT_NAME, size=11)  # not bold, no explicit color
+FONT_BRI = Font(name=FONT_NAME, bold=True, size=11, color="000000")
+FONT_FUND = Font(name=FONT_NAME, size=11, color="000000")
+FONT_INDEX = Font(name=FONT_NAME, bold=True, size=11, color="000000")
 
 
 def top_group(section: str) -> str:
     s = section.lower()
-    if any(k in s for k in ["equity", "global sharia equity", "index & etf", "etf fund"]):
+    if any(k in s for k in ["equity", "global sharia equity"]):
         return "Equity Fund"
     if "money market" in s or "pasar uang" in s:
         return "Money Market Fund"
     if any(k in s for k in ["balanced", "berimbang", "campuran"]):
         return "Balanced Fund"
-    if any(k in s for k in ["fixed income", "pendapatan tetap", "obligasi"]):
+    if any(k in s for k in ["index & etf", "etf fund", "etf"]):
+        return "Index & ETF Fund"
+    if any(
+        k in s for k in ["fixed income", "pendapatan tetap", "obligasi", "duration"]
+    ):
         return "Fixed Income Fund"
     return section
 
@@ -1020,11 +1203,31 @@ def _is_bri(name: str) -> bool:
     return str(name).upper().startswith("BRI ")
 
 
-PT_DATA_COLS = ["1 Hr(%)", "1 Mgg(%)", "MTD(%)", "1 Bln(%)", "3 Bln(%)",
-                "6 Bln(%)", "YTD(%)", "1 Thn(%)", "3 Thn(%)"]
-PT_HEADERS   = ["Nama", "NAB/UP", "1 Hr (%)", "1 Mgg (%)", "MTD (%)",
-                "1 Bln (%)", "3 Bln (%)", "6 Bln (%)", "YTD (%)",
-                "1 Thn (%)", "3 Thn (%)", "Rank 1Y"]
+PT_DATA_COLS = [
+    "1 Hr(%)",
+    "1 Mgg(%)",
+    "MTD(%)",
+    "1 Bln(%)",
+    "3 Bln(%)",
+    "6 Bln(%)",
+    "YTD(%)",
+    "1 Thn(%)",
+    "3 Thn(%)",
+]
+PT_HEADERS = [
+    "Nama",
+    "NAB/UP",
+    "1 Hr (%)",
+    "1 Mgg (%)",
+    "MTD (%)",
+    "1 Bln (%)",
+    "3 Bln (%)",
+    "6 Bln (%)",
+    "YTD (%)",
+    "1 Thn (%)",
+    "3 Thn (%)",
+    "Rank 1Y",
+]
 
 
 def write_page_table(wb, df, nav_date_str: str | None = None):
@@ -1035,7 +1238,11 @@ def write_page_table(wb, df, nav_date_str: str | None = None):
     row += 1
 
     # ── Row 2: *NAV as of …  (use date from source data)
-    nav_label = f"*NAV as of {nav_date_str}" if nav_date_str else "*NAV as of (date unavailable)"
+    nav_label = (
+        f"*NAV as of {nav_date_str}"
+        if nav_date_str
+        else "*NAV as of (date unavailable)"
+    )
     ws.cell(row, 1, nav_label)
     _fill_row(ws, row, FILL_NAV_DATE, FONT_NAV_DATE, ncols=13)
     row += 1
@@ -1087,7 +1294,9 @@ def write_page_table(wb, df, nav_date_str: str | None = None):
         if not skip_rank and len(non_idx) > 0 and "Rank 1Y" in non_idx.columns:
             non_idx = non_idx.copy()
             non_idx["_sort_rank"] = non_idx["Rank 1Y"].apply(
-                lambda x: x if x is not None and not (isinstance(x, float) and math.isnan(x)) else 9999
+                lambda x: x
+                if x is not None and not (isinstance(x, float) and math.isnan(x))
+                else 9999
             )
             non_idx = non_idx.sort_values("_sort_rank", kind="mergesort")
 
@@ -1128,8 +1337,13 @@ def _write_fund_row(ws, row: int, f, ncols: int, skip_rank: bool = False) -> int
         vals = (
             [f["display_name"], _fmt(f.get("NAB/UP"))]
             + [_fmt(f.get(c)) for c in PT_DATA_COLS]
-            + [int(rank) if rank is not None and not (isinstance(rank, float) and math.isnan(rank)) else None,
-               _fmt(f.get("AUM"))]
+            + [
+                int(rank)
+                if rank is not None
+                and not (isinstance(rank, float) and math.isnan(rank))
+                else None,
+                _fmt(f.get("AUM")),
+            ]
         )
     for ci, v in enumerate(vals, 1):
         cell = ws.cell(row, ci, v)
@@ -1175,31 +1389,60 @@ def _write_index_row(ws, row: int, f, ncols: int, skip_rank: bool = False) -> in
 # OUTPUT: NEW PERFORMANCE TABLE
 # ─────────────────────────────────────────────────────────────────────────────
 
-PPT_DATA_COLS = ["1 Hr(%)", "1 Mgg(%)", "1 Bln(%)", "3 Bln(%)",
-                 "6 Bln(%)", "YTD(%)", "1 Thn(%)", "3 Thn(%)", "5 Thn(%)"]
-PPT_HEADERS   = ["Nama", "NAB/UP", "1 Hr (%)", "1 Mgg (%)", "1 Bln (%)",
-                 "3 Bln (%)", "6 Bln (%)", "YTD (%)", "1 Thn (%)", "3 Thn (%)",
-                 "5 Thn (%)", "Since Inception", "SI Date", "AUM (Rp Miliar)",
-                 "Score 1Y", "Quartile 3Bln", "Quartile 6Bln", "Quartile 1Y",
-                 "Quartile YTD"]
+PPT_DATA_COLS = [
+    "1 Hr(%)",
+    "1 Mgg(%)",
+    "1 Bln(%)",
+    "3 Bln(%)",
+    "6 Bln(%)",
+    "YTD(%)",
+    "1 Thn(%)",
+    "3 Thn(%)",
+    "5 Thn(%)",
+]
+PPT_HEADERS = [
+    "Nama",
+    "NAB/UP",
+    "1 Hr (%)",
+    "1 Mgg (%)",
+    "1 Bln (%)",
+    "3 Bln (%)",
+    "6 Bln (%)",
+    "YTD (%)",
+    "1 Thn (%)",
+    "3 Thn (%)",
+    "5 Thn (%)",
+    "Since Inception",
+    "SI Date",
+    "AUM (Rp Miliar)",
+    "Score 1Y",
+    "Quartile 3Bln",
+    "Quartile 6Bln",
+    "Quartile 1Y",
+    "Quartile YTD",
+]
 
 
 def write_perf_table(wb, df, nav_date_str=None):
     """Write NEW PERFORMANCE TABLE (output) sheet with all columns."""
-    ws  = wb.create_sheet("NEW PERFORMANCE TABLE (output)")
+    ws = wb.create_sheet("NEW PERFORMANCE TABLE (output)")
     row = 1
-    CS  = 4   # start at column D
-    NC  = len(PPT_HEADERS)
+    CS = 4  # start at column D
+    NC = len(PPT_HEADERS)
 
-    ws.cell(row, CS, f"BRI MI Daily Performance  |  Data Per {datetime.today().strftime('%d %B %Y')}")
+    ws.cell(
+        row,
+        CS,
+        f"BRI MI Daily Performance  |  Data Per {datetime.today().strftime('%d %B %Y')}",
+    )
     ws.cell(row, CS).font = Font(bold=True, size=12)
     row += 2
 
     # Row 6: main headers
     for ci, h in enumerate(PPT_HEADERS, CS):
         c = ws.cell(row, ci, h)
-        c.font      = Font(bold=True, color="FFFFFF", size=9)
-        c.fill      = PatternFill("solid", fgColor="1F4E79")
+        c.font = Font(bold=True, color="FFFFFF", size=9)
+        c.fill = PatternFill("solid", fgColor="1F4E79")
         c.alignment = Alignment(horizontal="center", wrap_text=True)
     ws.row_dimensions[row].height = 32
     row += 1
@@ -1207,8 +1450,8 @@ def write_perf_table(wb, df, nav_date_str=None):
     # Row 7: sub-headers under Quartile columns
     for ci, label in enumerate(["3 Bln", "6 Bln", "1Y", "YTD"], CS + NC - 4):
         c = ws.cell(row, ci, label)
-        c.font      = Font(bold=True, color="FFFFFF", size=8)
-        c.fill      = PatternFill("solid", fgColor="1F4E79")
+        c.font = Font(bold=True, color="FFFFFF", size=8)
+        c.fill = PatternFill("solid", fgColor="1F4E79")
         c.alignment = Alignment(horizontal="center")
     row += 1
 
@@ -1227,11 +1470,15 @@ def write_perf_table(wb, df, nav_date_str=None):
             prev_group = group
 
         # Quartile labels
-        q_3bln  = f.get("Quartile_3Bln")
-        q_6bln  = f.get("Quartile_6Bln")
-        q_1y    = f.get("Quartile")
-        q_ytd   = f.get("Quartile_YTD")
-        q_lbl = lambda v: QUARTILE_LABELS.get(int(v)) if v is not None and not (isinstance(v, float) and math.isnan(v)) else None
+        q_3bln = f.get("Quartile_3Bln")
+        q_6bln = f.get("Quartile_6Bln")
+        q_1y = f.get("Quartile")
+        q_ytd = f.get("Quartile_YTD")
+        q_lbl = (
+            lambda v: QUARTILE_LABELS.get(int(v))
+            if v is not None and not (isinstance(v, float) and math.isnan(v))
+            else None
+        )
 
         # Score 1Y: star text format from scoring API (e.g. "* * * -", "* +", "No Score")
         score_str = f.get("Score 1Y")
@@ -1242,17 +1489,22 @@ def write_perf_table(wb, df, nav_date_str=None):
         vals = (
             [f["display_name"], _fmt(f.get("NAB/UP"))]
             + [_fmt(f.get(c)) for c in PPT_DATA_COLS]
-            + [_fmt(f.get("since_inception")),
-               si_date if si_date else None,
-               _fmt(f.get("AUM")),
-               score_str,
-               q_lbl(q_3bln), q_lbl(q_6bln), q_lbl(q_1y), q_lbl(q_ytd)]
+            + [
+                _fmt(f.get("since_inception")),
+                si_date if si_date else None,
+                _fmt(f.get("AUM")),
+                score_str,
+                q_lbl(q_3bln),
+                q_lbl(q_6bln),
+                q_lbl(q_1y),
+                q_lbl(q_ytd),
+            ]
         )
         for ci, v in enumerate(vals, CS):
             cell = ws.cell(row, ci, v)
             if ci > CS and isinstance(v, float):
                 cell.number_format = "#,##0.0000"
-                cell.alignment     = Alignment(horizontal="right")
+                cell.alignment = Alignment(horizontal="right")
 
         if f.get("is_benchmark"):
             for c in range(CS, CS + NC):
@@ -1267,8 +1519,8 @@ def write_perf_table(wb, df, nav_date_str=None):
             q_label = q_lbl(q_val)
             if q_label in QUARTILE_COLORS:
                 qc = ws.cell(row, CS + NC - 4 + qi)
-                qc.fill      = PatternFill("solid", fgColor=QUARTILE_COLORS[q_label])
-                qc.font      = Font(bold=True, color="FFFFFF", size=9)
+                qc.fill = PatternFill("solid", fgColor=QUARTILE_COLORS[q_label])
+                qc.font = Font(bold=True, color="FFFFFF", size=9)
                 qc.alignment = Alignment(horizontal="center")
 
         row += 1
@@ -1288,8 +1540,8 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print(__doc__)
         sys.exit(1)
-    inp      = sys.argv[1]
-    out      = sys.argv[2] if len(sys.argv) > 2 else "brimi_output.xlsx"
+    inp = sys.argv[1]
+    out = sys.argv[2] if len(sys.argv) > 2 else "brimi_output.xlsx"
     universe = sys.argv[3] if len(sys.argv) > 3 else "fund_universe.json"
-    fmap     = sys.argv[4] if len(sys.argv) > 4 else "fund_map.json"
+    fmap = sys.argv[4] if len(sys.argv) > 4 else "fund_map.json"
     process(inp, out, universe, fmap)

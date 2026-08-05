@@ -1258,8 +1258,8 @@
             "active": true
           },
           {
-            "display_name": "BRI Syariah Berimbang",
-            "alias": "BRI Syariah Berimbang - Total Return*",
+            "display_name": "BRI-MI Anagata Lestari Berimbang Kelas A - Total Return*",
+            "alias": "BRI-MI Anagata Lestari Berimbang Kelas A - Total Return*",
             "is_index": false,
             "active": true
           },
@@ -1272,34 +1272,12 @@
         ]
       },
       {
-        "section": "Fixed Income Fund",
+        "section": "Short to Med Duration Fund",
         "is_usd": false,
         "aum_unit": "Rp Miliar",
+        "skip_rank": null,
+        "rank_group": null,
         "funds": [
-          {
-            "display_name": "BRI Melati Pendapatan Utama",
-            "alias": "BRI Melati Pendapatan Utama - Total Return*",
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Ashmore Dana Obligasi Nusantara Kelas A - Total Return*",
-            "alias": "Ashmore Dana Obligasi Nusantara Kelas A - Total Return*",
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "BNP Paribas Prima II Kelas RK1",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Bahana Pendapatan Tetap Makara Prima Kelas G",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
           {
             "display_name": "Trimegah Fixed Income Plan - Total Return*",
             "alias": null,
@@ -1307,7 +1285,13 @@
             "active": true
           },
           {
-            "display_name": "Mandiri Investa Dana Obligasi Seri II Kelas A",
+            "display_name": "BRI Pendapatan Prima Plus - Total Return*",
+            "alias": "BRI Pendapatan Prima Plus",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Bahana Pendapatan Tetap Makara Prima Kelas G",
             "alias": null,
             "is_index": false,
             "active": true
@@ -1319,62 +1303,13 @@
             "active": true
           },
           {
-            "display_name": "Schroder Dana Mantap Plus II",
-            "alias": null,
+            "display_name": "BRI Melati Pendapatan Utama - Total Return*",
+            "alias": "BRI Melati Pendapatan Utama - Total Return*",
             "is_index": false,
             "active": true
           },
           {
-            "display_name": "Infovesta Government Bond Index",
-            "alias": null,
-            "is_index": true,
-            "active": true
-          }
-        ]
-      },
-      {
-        "section": "Fixed Income Fund",
-        "is_usd": false,
-        "aum_unit": "Rp Miliar",
-        "funds": [
-          {
-            "display_name": "BRI Pendapatan Tetap Indonesia Sehat",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Ashmore Dana Obligasi Nusantara Kelas A - Total Return*",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "BNP Paribas Prima II Kelas RK1",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Bahana Pendapatan Tetap Makara Prima Kelas G",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Trimegah Fixed Income Plan - Total Return*",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Mandiri Investa Dana Obligasi Seri II Kelas A",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Bahana Obligasi Ganesha Kelas D - Total Return*",
+            "display_name": "Mandiri Investa Dana Utama Kelas A",
             "alias": null,
             "is_index": false,
             "active": true
@@ -1394,162 +1329,12 @@
         ]
       },
       {
-        "section": "Fixed Income Fund (SUN ONLY)",
-        "is_usd": false,
-        "aum_unit": "Rp Miliar",
-        "funds": [
-          {
-            "display_name": "BRI Brawijaya Abadi Pendapatan Tetap",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "BNP Paribas Prima II Kelas RK1",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Ashmore Dana Obligasi Nusantara Kelas A - Total Return*",
-            "alias": "Ashmore Dana Obligasi Nusantara Kelas A - Total Return*",
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Schroder Prestasi Gebyar Indonesia II",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Mandiri Investa Dana Obligasi Seri II Kelas A",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Panin Gebyar Indonesia II",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Eastspring Investments IDR High Grade Kelas A - Total Return*",
-            "alias": "Eastspring Investments IDR High Grade Kelas A - Total Return*",
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Bahana Obligasi Kehati Lestari Kelas G",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Schroder Dana Mantap Plus II",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Manulife Obligasi Negara Indonesia II Kelas Income 1",
-            "alias": "Manulife Obligasi Negara Indonesia II Kelas Income 1 - Total Return*",
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Infovesta Government Bond Index",
-            "alias": null,
-            "is_index": true,
-            "active": true
-          }
-        ]
-      },
-      {
-        "section": "Fixed Income Fund (SUN ONLY)",
-        "is_usd": false,
-        "aum_unit": "Rp Miliar",
-        "funds": [
-          {
-            "display_name": "BRI Gebyar Indonesia II",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Schroder Dana Mantap Plus II",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "BNP Paribas Prima II Kelas RK1",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Bahana Obligasi Kehati Lestari Kelas G",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Schroder Prestasi Gebyar Indonesia II",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Panin Gebyar Indonesia II",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Eastspring Investments IDR High Grade Kelas A - Total Return*",
-            "alias": "Eastspring Investments IDR High Grade Kelas A - Total Return*",
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Mandiri Investa Dana Obligasi Seri II Kelas A",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Ashmore Dana Obligasi Nusantara Kelas A - Total Return*",
-            "alias": "Ashmore Dana Obligasi Nusantara Kelas A - Total Return*",
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Manulife Obligasi Negara Indonesia II Kelas Income 1",
-            "alias": "Manulife Obligasi Negara Indonesia II Kelas Income 1 - Total Return*",
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Infovesta Government Bond Index",
-            "alias": null,
-            "is_index": true,
-            "active": true
-          }
-        ]
-      },
-      {
-        "section": "Fixed Income USD",
+        "section": "Med to Long Duration Fund USD Fund",
         "is_usd": true,
         "aum_unit": "Juta USD",
+        "skip_rank": null,
+        "rank_group": null,
         "funds": [
-          {
-            "display_name": "Ashmore Dana USD Nusantara Kelas A - Total Return*",
-            "alias": "Ashmore Dana USD Nusantara Kelas A - Total Return*",
-            "is_index": false,
-            "active": true
-          },
           {
             "display_name": "BNP Paribas Prima USD Kelas RK1",
             "alias": null,
@@ -1563,20 +1348,8 @@
             "active": true
           },
           {
-            "display_name": "Schroder USD Bond Fund Class A",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Investa Dana Dollar Mandiri Kelas A",
-            "alias": null,
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Manulife USD Fixed Income Kelas A",
-            "alias": null,
+            "display_name": "Ashmore Dana USD Nusantara Kelas A - Total Return*",
+            "alias": "Ashmore Dana USD Nusantara Kelas A - Total Return*",
             "is_index": false,
             "active": true
           },
@@ -1589,25 +1362,69 @@
         ]
       },
       {
-        "section": "FIXED INCOME (Institution)",
+        "section": "Med to Long Duration Fund",
         "is_usd": false,
         "aum_unit": "Rp Miliar",
+        "skip_rank": null,
+        "rank_group": null,
         "funds": [
           {
-            "display_name": "BRI Pendapatan Prima Plus - Total Return*",
-            "alias": "BRI Pendapatan Prima Plus",
-            "is_index": false,
-            "active": true
-          },
-          {
-            "display_name": "Mandiri Obligasi Utama Sejahtera",
+            "display_name": "BRI Pendapatan Tetap Indonesia Sehat",
             "alias": null,
             "is_index": false,
             "active": true
           },
           {
-            "display_name": "PNM SBN 90 - Total Return*",
+            "display_name": "BRI Brawijaya Abadi Pendapatan Tetap",
             "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Schroder Prestasi Gebyar Indonesia II",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Panin Gebyar Indonesia II",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BNP Paribas Prima II Kelas RK1",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BRI Gebyar Indonesia II",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Mandiri Investa Dana Obligasi Seri II Kelas A",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Bahana Obligasi Kehati Lestari Kelas G",
+            "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Eastspring Investments IDR High Grade Kelas A - Total Return*",
+            "alias": "Eastspring Investments IDR High Grade Kelas A - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Ashmore Dana Obligasi Nusantara Kelas A - Total Return*",
+            "alias": "Ashmore Dana Obligasi Nusantara Kelas A - Total Return*",
             "is_index": false,
             "active": true
           },
@@ -1618,7 +1435,13 @@
             "active": true
           },
           {
-            "display_name": "Infovesta Fixed Income Fund Index",
+            "display_name": "Manulife Obligasi Negara Indonesia II Kelas Income 1",
+            "alias": "Manulife Obligasi Negara Indonesia II Kelas Income 1 - Total Return*",
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "Infovesta Government Bond Index",
             "alias": null,
             "is_index": true,
             "active": true
@@ -1853,8 +1676,8 @@
         "si_date": "2019-07-01"
       },
       {
-        "display_name": "BRI Syariah Berimbang - Total Return*",
-        "brimi_alias": "BRI Syariah Berimbang",
+        "display_name": "BRI-MI Anagata Lestari Berimbang Kelas A - Total Return*",
+        "brimi_alias": "BRI-MI Anagata Lestari Berimbang Kelas A",
         "group": "Balanced",
         "quartile_group": "Q_Balanced_Syariah",
         "is_price_return": false,
