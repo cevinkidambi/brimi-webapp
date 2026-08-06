@@ -78,6 +78,11 @@ entrypoint inlines all HTML; app.py renders `templates/index.html`).
 - **Production URL**: https://brimimiperi.vercel.app
 - **Admin**: https://brimimiperi.vercel.app/admin
 - **GitHub integration**: pushing to `main` auto-deploys production. Use local preview deploys to test before any prod push.
+- **Account/domain migration**: the project is owned by a personal Vercel account
+  (`cevinkidambi`). On handover the project moves to the team account and the
+  production domain WILL change. See `HANDOVER.md` §9 for the full migration runbook
+  (re-provision project, re-add all 8 env vars, re-attach custom domain + DNS, re-link
+  GitHub, re-verify, then update the URL everywhere).
 
 ### Deploy workflow (preview first, always)
 

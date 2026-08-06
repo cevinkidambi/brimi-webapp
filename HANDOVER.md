@@ -156,6 +156,36 @@ Hand these to the new maintainer / manager:
 - [ ] **GITHUB_TOKEN**: a PAT with `repo` scope used by the admin save endpoint. If owned by the departing user's GitHub account, it must be reissued as a machine/team token, or admin saves will break.
 - [ ] **Deploy access**: developer or admin role on Vercel CLI.
 
+## 9. Domain / Account Migration (IMPORTANT)
+
+The current host account (`cevinkidambi` / login `safourkidambi@gmail.com`) owns the
+Vercel project and its `brimimiperi.vercel.app` alias. After handover the project will
+move to the team's account, so **the production domain WILL change**. Plan for it:
+
+1. **Decide the destination**: create a new Vercel team/project on the team account, or
+   transfer ownership of the project to a team.
+2. **Re-provision the project** — a fresh Vercel project gets a NEW default domain
+   (`<project>.vercel.app`), so update every place that references the old URL:
+   - End user / README / this doc: replace `https://brimimiperi.vercel.app`.
+   - Custom domain: if a custom domain is used (BRI CRM), re-attach it in the new
+     project's Settings → Domains and update DNS as prompted. Same domain porting can't
+     happen automatically across accounts.
+3. **Recreate all deployment settings** in the new project:
+   - `vercel.json` (must keep `"fluid": true`) — copy from repo root.
+   - `builds` `@vercel/python` + routes — already in `vercel.json`.
+4. **Re-add ALL 8 env vars** to the new project (Production AND Preview):
+   `INVESTDATA_*` (4) + `GITHUB_*` (4). See `.env.example`. Values can be copied from the
+   old project's Settings → Environment Variables.
+5. **Re-link the GitHub integration** on the new project so push-to-main auto-deploys
+   (optional but recommended). Use `vercel link` / Vercel dashboard Git settings.
+6. **Deploy and verify** on the new project: main page 200, `/admin` loads, and
+   `/admin/config` returns the 26 sections before telling users the new URL.
+7. **Communicate the new URL** to anyone who has bookmarked `brimimiperi.vercel.app`.
+   Optionally keep the old project alive briefly as a redirect.
+
+Local CLI deploys on the new account also land on the new domain — run
+`vercel link` (or `vercel --token <team-token>`) under the team account once.
+
 ---
 
 *Generated at handover. CLI account: `cevinkidambi` (Vercel login `safourkidambi@gmail.com`). Branch `main` is deployable; current live config = fixed-income duration sections + fund renames (BRI-MI Anagata) + Index & ETF banner.*
