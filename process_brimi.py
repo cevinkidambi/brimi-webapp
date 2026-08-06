@@ -1200,7 +1200,8 @@ def _fill_row(ws, row: int, fill, font, ncols: int = 13):
 
 def _is_bri(name: str) -> bool:
     """Check if a fund name is a BRI fund."""
-    return str(name).upper().startswith("BRI ")
+    up = str(name).upper()
+    return up.startswith("BRI ") or up.startswith("BRI-")
 
 
 PT_DATA_COLS = [
@@ -1510,9 +1511,10 @@ def write_perf_table(wb, df, nav_date_str=None):
             for c in range(CS, CS + NC):
                 ws.cell(row, c).fill = PatternFill("solid", fgColor="F2F2F2")
                 ws.cell(row, c).font = Font(italic=True, color="666666")
-        elif str(f["display_name"]).startswith("BRI "):
+        elif _is_bri(str(f["display_name"])):
             for c in range(CS, CS + NC):
                 ws.cell(row, c).fill = PatternFill("solid", fgColor="EBF3FB")
+            ws.cell(row, CS).font = FONT_BRI
 
         # Color quartile cells
         for qi, q_val in enumerate([q_3bln, q_6bln, q_1y, q_ytd]):
