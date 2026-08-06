@@ -47,11 +47,17 @@ User-facing flow. No code changes normally needed.
 ## 3. Setup a developer's machine
 
 ```bash
-git clone https://github.com/cevinkidambi/brimi-webapp.git
+git clone <your-repo-url>        # repo moves to the team org — clone from there
 cd brimi-webapp
 pip install -r requirements.txt
 cp investdata_api/.env.example investdata_api/.env   # fill real creds
 python app.py          # local server on :5001, uses ./tmp
+```
+
+Alternative via Docker (host-agnostic, no local Python needed):
+```bash
+docker build -t brimi .
+docker run -p 5001:5001 -e INVESTDATA_USERNAME=... -e INVESTDATA_PASSWORD=... brimi
 ```
 
 Local processing of an existing compiled workbook:
@@ -62,6 +68,8 @@ python process_brimi.py tmp/compiled_input.xlsx out.xlsx
 ---
 
 ## 4. Deployment (CRITICAL RULES)
+
+These rules are for the CURRENT Vercel hosting. See §9b for moving to any other host.
 
 - **NEVER deploy straight to production.**
 - **Pushing to `main` auto-deploys production** via Vercel GitHub integration.
@@ -149,21 +157,43 @@ Parity of output vs a reference Excel: `python parity_check.py <output> <referen
 
 Hand these to the new maintainer / manager:
 
-- [ ] **Vercel**: add team members to the `brimi-webapp` project (Settings → Members / Team). Owner / account `cevinkidambi` (login `safourkidambi@gmail.com`).
-- [ ] **GitHub**: transfer/maintain access to the `cevinkidambi/brimi-webapp` repo (owner `cevinkidambi`).
-- [ ] **Infovesta API creds**: the values in `investdata_api/.env` (`INVESTDATA_USERNAME`/`PASSWORD`) and the same 4 `INVESTDATA_*` Vercel env vars. Reissue if the departing user is the credential owner.
-- [ ] **Vercel env vars**: confirm all 8 vars are present on Production AND Preview, and update them if credentials rotate.
-- [ ] **GITHUB_TOKEN**: a PAT with `repo` scope used by the admin save endpoint. If owned by the departing user's GitHub account, it must be reissued as a machine/team token, or admin saves will break.
-- [ ] **Deploy access**: developer or admin role on Vercel CLI.
+- [ ] **GitHub**: transfer `cevinkidambi/brimi-webapp` to the team org (Settings → Danger Zone → Transfer ownership).
+- [ ] **Host account**: transfer/re-provision the hosting project (currently Vercel — `cevinkidambi`, login `safourkidambi@gmail.com`) OR set up a new host (see §9b).
+- [ ] **Infovesta API creds**: REISSUE fresh `INVESTDATA_USERNAME`/`PASSWORD` on the team's Infovesta account — the current ones belong to the departing employee and will stop working.
+- [ ] **Host env vars**: set all 8 vars (`INVESTDATA_*` + `GITHUB_*`) on the new host from the new creds.
+- [ ] **GITHUB_TOKEN**: reissue as a machine/team PAT with `repo` scope (a personal PAT of the departing account dies with it, and admin saves break).
+- [ ] **Deploy access**: developer/admin role on the new host for the new maintainer.
 
-## 9. Account / Domain Migration (IMPORTANT — full two-account move)
+## 9. Account / Domain Migration (IMPORTANT — hand the codebase + infrastructure)
 
-**Both** the GitHub and Vercel accounts are personal (`cevinkidambi` / login
-`safourkidambi@gmail.com`) and will be retired. The repo AND the project must move to
-the team's accounts. A fresh Vercel project on the new account gets a NEW default
-domain, so **the production URL will change**. Full plan:
+**The GitHub and Vercel accounts are personal (`cevinkidambi` / login
+`safourkidambi@gmail.com`) and will be retired.** The team must take over BOTH the
+codebase (the git repo) AND the infrastructure (deployment config, env vars, secrets,
+and the hosting account). The current production deployment stays live in the meantime,
+so there is no deadline pressure — the new host goes up first, then it is switched over.
 
-### 9a. GitHub — move the repo (source of truth)
+**The app is NOT Vercel-locked.** It is a plain Python/Flask app. `vercel.json` + the
+Vercel CLI are simply one way to host it (used here only because that was the departing
+engineer's choice). The exact same code runs on any WSGI-capable host via
+`gunicorn app:app` (see `Procfile`) or as a container (see new `Dockerfile`). So the team
+is free to pick any host (AWS, GCP, Render, Railway, a VM, K8s, etc.). What MUST be
+transferred are the **credentials and the deploy configuration**, listed below.
+
+### What "codebase + infra" means here (transfer checklist)
+
+**Codebase** (portable by definition — it is in git):
+- Everything in `https://github.com/cevinkidambi/brimi-webapp.git` — code,
+  `fund_universe.json`, `fund_map.json`, `quartile_group_mapping.json`,
+  `insurance.xlsx`, `requirements.txt`, `Procfile`, `vercel.json`, docs.
+
+**Infrastructure** (NOT in git — must be recreated / reissued on the team side):
+- Host / project (currently Vercel) + its env config.
+- The 8 env vars (credentials) — `INVESTDATA_*` (4) + `GITHUB_*` (4).
+- `investdata_api/.env` (real Infovesta creds) — gitignored.
+- A `GITHUB_TOKEN` PAT (owner of the retiring account, must be reissued).
+- A custom domain, if any.
+
+### 9a. GitHub — transfer the repo (source of truth for code)
 
 1. **Create the destination**: a new GitHub org (recommended) or a team member's account.
 2. **Transfer the repo**: GitHub → repo `Settings` → `Danger Zone` → `Transfer ownership`
@@ -175,40 +205,54 @@ domain, so **the production URL will change**. Full plan:
    the org name changes, also update the code default + `.env.example`.
 5. Team clones/pushes as normal afterward.
 
-### 9b. Vercel — re-provision the project
+### 9b. Re-provision the project on a NEW host (Vercel is one option)
 
+The team can host anywhere. Two paths:
+
+**If the team stays on Vercel:**
 1. **Create the destination**: new Vercel team + project on the team account.
-2. **Re-provision the project** — a fresh project gets a NEW default domain
-   (`<project>.vercel.app`), so update every place that references the old URL:
-   - End user / README / this doc: replace `https://brimimiperi.vercel.app`.
-   - Custom domain: if a custom domain is used (BRI CRM), re-attach it in the new
-     project's Settings → Domains and update DNS as prompted. Domains don't port
-     automatically across accounts.
-3. **Recreate all deployment settings** in the new project:
-   - `vercel.json` (must keep `"fluid": true`) — copy from repo root.
-   - `builds` `@vercel/python` + routes — already in `vercel.json`.
-4. **Re-add ALL 8 env vars** to the new project (Production AND Preview):
-   `INVESTDATA_*` (4) + `GITHUB_*` (4). See `.env.example`. Copy values from the
-   old project's Settings → Environment Variables (or re-issue the Infovesta creds
-   if the retiring user owns them).
-5. **Re-link the GitHub integration** on the new project so push-to-main auto-deploys
-   (recommended). Use `vercel link` / Vercel dashboard Git settings.
-6. **Deploy and verify** on the new project: main page 200, `/admin` loads, and
-   `/admin/config` returns the 26 sections before telling users the new URL.
-7. **Communicate the new URL** to anyone who has bookmarked `brimimiperi.vercel.app`.
-   Optionally keep the old project alive briefly as a redirect.
+2. A fresh project gets a NEW default domain — update every reference to the old URL
+   in README / this doc / end users, and re-attach any custom domain (Settings → Domains).
+3. Recreate deployment settings: `vercel.json` (keep `"fluid": true`) is already in the
+   repo; re-link the GitHub integration for auto-deploy.
+4. **Re-add all 8 env vars** (Production AND Preview): `INVESTDATA_*` (4) + `GITHUB_*` (4).
+   See `.env.example`.
+5. Deploy + verify: main page 200, `/admin` loads, `/admin/config` returns the 26 sections.
 
-### 9c. Secrets that do NOT live in the repo
+**If the team uses ANY other host (recommended since Vercel was just the chooser):**
+1. It is a standard Flask app — no Vercel-specific code beyond `vercel.json`, which is
+   ignored on other hosts.
+2. Run it with the bundled `Procfile` (`gunicorn app:app`) or a container
+   (`Docker build -t brimi . && docker run -p 5001:5001 brimi`).
+3. Provide the same 8 env vars as environment variables on that host. Where a host
+   stores secrets (e.g. a `.env` file or a secrets manager), mirror
+   `.env.example` / `investdata_api/.env`.
+4. Share the new URL — the app has no hard-coded domain dependency, only what you point
+   at it.
 
-Transfer these out-of-band (secure channel, never in a public drive link):
+In BOTH cases the domain WILL change from `https://brimimiperi.vercel.app`.
+
+### 9c. Secrets — will CHANGE, so re-issue (not just copy)
+
+Transfer these out-of-band (secure channel, never in a public drive link).
+**Note: the current `INVESTDATA_*` credentials belong to the departing user's
+employee account and WILL be replaced.** Do not plan to keep them working.
+
 - `investdata_api/.env` (gitignored): real `INVESTDATA_USERNAME`/`PASSWORD`.
+  **Request fresh Infovesta API creds** on the team's Infovesta account.
 - `investdata_api/token.json` (gitignored): cached OAuth token — safe to delete; the
   app re-fetches via `.env`.
-- The 8 Vercel env var values (or re-issue as above).
+- The 8 env var values on the host — set the NEW creds, not the old ones.
+- `GITHUB_TOKEN`: a PAT with `repo` scope used by `/admin` save. Must be a machine/team
+  token, not a personal PAT of the departing account.
 
 Local CLI deploys on the new account also land on the new domain — run
 `vercel link` (or `vercel --token <team-token>`) under the team account once.
 
 ---
 
-*Generated at handover. CLI account: `cevinkidambi` (Vercel login `safourkidambi@gmail.com`). Branch `main` is deployable; current live config = fixed-income duration sections + fund renames (BRI-MI Anagata) + Index & ETF banner.*
+*Generated at handover. Current hosting: Vercel, account `cevinkidambi` (login
+`safourkidambi@gmail.com`), branch `main` is deployable; live config = fixed-income
+duration sections + fund renames (BRI-MI Anagata) + Index & ETF banner. The current
+deployment stays live until the team's new host is up. Infovesta API creds WILL be
+re-issued (departing employee account); GitHub and Vercel accounts both retire.*

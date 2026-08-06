@@ -79,10 +79,13 @@ entrypoint inlines all HTML; app.py renders `templates/index.html`).
 - **Admin**: https://brimimiperi.vercel.app/admin
 - **GitHub integration**: pushing to `main` auto-deploys production. Use local preview deploys to test before any prod push.
 - **Account/domain migration**: the project is owned by a personal Vercel account
-  (`cevinkidambi`). On handover the project moves to the team account and the
-  production domain WILL change. See `HANDOVER.md` §9 for the full migration runbook
-  (re-provision project, re-add all 8 env vars, re-attach custom domain + DNS, re-link
-  GitHub, re-verify, then update the URL everywhere).
+  (`cevinkidambi`) which will be retired, as will the GitHub account. The app is
+  **not Vercel-locked** — it is a plain Flask app (`Procfile`/`gunicorn app:app`, or
+  `Dockerfile` for containers) and can be hosted on any WSGI-capable platform. On
+  handover the team must transfer BOTH the repo and the infra (host, env vars,
+  secrets). The Investdata API credentials belong to a departing employee and will be
+  re-issued. Production domain WILL change. See `HANDOVER.md` §9 for the migration
+  runbook.
 
 ### Deploy workflow (preview first, always)
 
