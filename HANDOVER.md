@@ -156,32 +156,55 @@ Hand these to the new maintainer / manager:
 - [ ] **GITHUB_TOKEN**: a PAT with `repo` scope used by the admin save endpoint. If owned by the departing user's GitHub account, it must be reissued as a machine/team token, or admin saves will break.
 - [ ] **Deploy access**: developer or admin role on Vercel CLI.
 
-## 9. Domain / Account Migration (IMPORTANT)
+## 9. Account / Domain Migration (IMPORTANT — full two-account move)
 
-The current host account (`cevinkidambi` / login `safourkidambi@gmail.com`) owns the
-Vercel project and its `brimimiperi.vercel.app` alias. After handover the project will
-move to the team's account, so **the production domain WILL change**. Plan for it:
+**Both** the GitHub and Vercel accounts are personal (`cevinkidambi` / login
+`safourkidambi@gmail.com`) and will be retired. The repo AND the project must move to
+the team's accounts. A fresh Vercel project on the new account gets a NEW default
+domain, so **the production URL will change**. Full plan:
 
-1. **Decide the destination**: create a new Vercel team/project on the team account, or
-   transfer ownership of the project to a team.
-2. **Re-provision the project** — a fresh Vercel project gets a NEW default domain
+### 9a. GitHub — move the repo (source of truth)
+
+1. **Create the destination**: a new GitHub org (recommended) or a team member's account.
+2. **Transfer the repo**: GitHub → repo `Settings` → `Danger Zone` → `Transfer ownership`
+   → new owner. History and branches come along; old URL auto-redirects.
+3. **Re-issue `GITHUB_TOKEN`**: the PAT that `/admin` save uses must be owned by the new
+   org/a service account (a personal PAT under the retiring account dies with it).
+4. **Update `GITHUB_REPO_OWNER`** wherever the new owner differs — the code default is
+   hard-coded in `api/index.py` lines 630/661 (`cevinkidambi`). Prefer the env var; if
+   the org name changes, also update the code default + `.env.example`.
+5. Team clones/pushes as normal afterward.
+
+### 9b. Vercel — re-provision the project
+
+1. **Create the destination**: new Vercel team + project on the team account.
+2. **Re-provision the project** — a fresh project gets a NEW default domain
    (`<project>.vercel.app`), so update every place that references the old URL:
    - End user / README / this doc: replace `https://brimimiperi.vercel.app`.
    - Custom domain: if a custom domain is used (BRI CRM), re-attach it in the new
-     project's Settings → Domains and update DNS as prompted. Same domain porting can't
-     happen automatically across accounts.
+     project's Settings → Domains and update DNS as prompted. Domains don't port
+     automatically across accounts.
 3. **Recreate all deployment settings** in the new project:
    - `vercel.json` (must keep `"fluid": true`) — copy from repo root.
    - `builds` `@vercel/python` + routes — already in `vercel.json`.
 4. **Re-add ALL 8 env vars** to the new project (Production AND Preview):
-   `INVESTDATA_*` (4) + `GITHUB_*` (4). See `.env.example`. Values can be copied from the
-   old project's Settings → Environment Variables.
+   `INVESTDATA_*` (4) + `GITHUB_*` (4). See `.env.example`. Copy values from the
+   old project's Settings → Environment Variables (or re-issue the Infovesta creds
+   if the retiring user owns them).
 5. **Re-link the GitHub integration** on the new project so push-to-main auto-deploys
-   (optional but recommended). Use `vercel link` / Vercel dashboard Git settings.
+   (recommended). Use `vercel link` / Vercel dashboard Git settings.
 6. **Deploy and verify** on the new project: main page 200, `/admin` loads, and
    `/admin/config` returns the 26 sections before telling users the new URL.
 7. **Communicate the new URL** to anyone who has bookmarked `brimimiperi.vercel.app`.
    Optionally keep the old project alive briefly as a redirect.
+
+### 9c. Secrets that do NOT live in the repo
+
+Transfer these out-of-band (secure channel, never in a public drive link):
+- `investdata_api/.env` (gitignored): real `INVESTDATA_USERNAME`/`PASSWORD`.
+- `investdata_api/token.json` (gitignored): cached OAuth token — safe to delete; the
+  app re-fetches via `.env`.
+- The 8 Vercel env var values (or re-issue as above).
 
 Local CLI deploys on the new account also land on the new domain — run
 `vercel link` (or `vercel --token <team-token>`) under the team account once.
