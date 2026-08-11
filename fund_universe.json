@@ -1285,12 +1285,6 @@
             "active": true
           },
           {
-            "display_name": "BRI Pendapatan Prima Plus - Total Return*",
-            "alias": "BRI Pendapatan Prima Plus",
-            "is_index": false,
-            "active": true
-          },
-          {
             "display_name": "Bahana Pendapatan Tetap Makara Prima Kelas G",
             "alias": null,
             "is_index": false,
@@ -1377,6 +1371,12 @@
           {
             "display_name": "BRI Brawijaya Abadi Pendapatan Tetap",
             "alias": null,
+            "is_index": false,
+            "active": true
+          },
+          {
+            "display_name": "BRI Pendapatan Prima Plus - Total Return*",
+            "alias": "BRI Pendapatan Prima Plus",
             "is_index": false,
             "active": true
           },
